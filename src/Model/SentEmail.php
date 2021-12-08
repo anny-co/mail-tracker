@@ -17,7 +17,10 @@ use jdavidbakr\MailTracker\Contracts\SentEmailModel;
  * @property int $opens
  * @property int $clicks
  * @property int|null $message_id
+ * @property string|null $mailable_id
+ * @property string|null $mailable_type
  * @property Collection $meta
+ * @property Model|null $mailable
  */
 class SentEmail extends Model implements SentEmailModel
 {
@@ -38,6 +41,8 @@ class SentEmail extends Model implements SentEmailModel
         'meta',
         'opened_at',
         'clicked_at',
+        'mailable_id',
+        'mailable_type',
     ];
 
     protected $casts = [
@@ -45,4 +50,10 @@ class SentEmail extends Model implements SentEmailModel
         'opened_at' => 'datetime',
         'clicked_at' => 'datetime',
     ];
+
+
+    public function mailable()
+    {
+        return $this->morphTo('mailable');
+    }
 }

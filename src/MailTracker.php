@@ -326,8 +326,16 @@ class MailTracker
                     'opens' => 0,
                     'clicks' => 0,
                     'message_id' => Str::uuid(),
-                ]), function(Model|SentEmailModel $sentEmail) use ($original_html, $hash) {
+                ]), function(Model|SentEmailModel $sentEmail) use ($original_html, $hash, $headers) {
                     $sentEmail->fillContent($original_html, $hash);
+
+                    // extract mailable linking info
+                    if ($headers->get('X-Mailable-Id') && $headers->get('X-Mailable-Type')) {
+                        $sentEmail->mailable_type = $sentEmail->getHeader('X-Mailable-Type');
+                        $sentEmail->mailable_id = $sentEmail->getHeader('X-Mailable-Id');
+                        $headers->remove('X-Mailable-Type');
+                        $headers->remove('X-Mailable-Id');
+                    }
 
                     $sentEmail->save();
                 });
@@ -355,7 +363,7 @@ class MailTracker
                     Storage::disk(config('mail-tracker.tracker-filesystem'))->delete($filePath);
                 }
             });
-            
+
             MailTracker::sentEmailUrlClickedModel()->newQuery()->whereIn('sent_email_id', $emails->pluck('id'))->delete();
             MailTracker::sentEmailModel()->newQuery()->whereIn('id', $emails->pluck('id'))->delete();
         }
