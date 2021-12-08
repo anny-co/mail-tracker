@@ -1313,4 +1313,46 @@ class SentEmailStub extends Model
 
 class SentEmailUrlClickedStub extends Model
 {
+
+    public function testMailableRelation()
+    {
+        Event::fake();
+
+        $faker = Factory::create();
+        $email = $faker->email;
+        $subject = $faker->sentence;
+        $name = $faker->firstName . ' ' .$faker->lastName;
+        \View::addLocation(__DIR__);
+        try {
+            \Mail::send('email.test', [], function ($message) use ($email, $subject, $name) {
+                $message->from('from@johndoe.com', 'From Name');
+                $message->sender('sender@johndoe.com', 'Sender Name');
+
+                $message->to($email, $name);
+
+                $message->cc('cc@johndoe.com', 'CC Name');
+                $message->bcc('bcc@johndoe.com', 'BCC Name');
+
+                $message->replyTo('reply-to@johndoe.com', 'Reply-To Name');
+
+                $message->subject($subject);
+
+                $message->priority(3);
+
+                $message->getHeaders()->addTextHeader('X-Mailable-Id', 123);
+                $message->getHeaders()->addTextHeader('X-Mailable-Type', 'orders');
+            });
+        } catch (Swift_TransportException $e) {
+        }
+
+        $this->assertDatabaseHas('sent_emails', [
+            'subject' => $subject,
+            'sender_name' => 'From Name',
+            'sender_email' => 'from@johndoe.com',
+            'recipient_name' => $name,
+            'recipient_email' => $email,
+            'mailable_id' => '123',
+            'mailable_type' => 'orders',
+        ]);
+    }
 }

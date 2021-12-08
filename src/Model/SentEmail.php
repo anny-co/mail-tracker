@@ -20,7 +20,10 @@ use jdavidbakr\MailTracker\MailTracker;
  * @property int $opens
  * @property int $clicks
  * @property int|null $message_id
+ * @property string|null $mailable_id
+ * @property string|null $mailable_type
  * @property Collection $meta
+ * @property Model|null $mailable
  */
 class SentEmail extends Model
 {
@@ -39,6 +42,8 @@ class SentEmail extends Model
         'meta',
         'opened_at',
         'clicked_at',
+        'mailable_id',
+        'mailable_type',
     ];
 
     protected $casts = [
@@ -216,5 +221,10 @@ class SentEmail extends Model
         }
 
         $this->content = $databaseContent;
+    }
+
+    public function mailable()
+    {
+        return $this->morphTo('mailable');
     }
 }
