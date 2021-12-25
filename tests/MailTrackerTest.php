@@ -1312,6 +1312,48 @@ class MailTrackerTest extends SetUpTest
         ]);
     }
 
+    public function testLogMailDriver(){
+        Event::fake();
+
+        $faker = Factory::create();
+        $email = $faker->email;
+        $subject = $faker->sentence;
+        $name = $faker->firstName . ' ' .$faker->lastName;
+
+        $str = Mockery::mock(Str::class);
+        app()->instance(Str::class, $str);
+        $str->shouldReceive('random')
+            ->andReturn('random-hash');
+
+        config()->set('mail-tracker.log-mail-driver', true);
+
+        \View::addLocation(__DIR__);
+        try {
+            \Mail::send('email.test', [], function ($message) use ($email, $subject, $name) {
+                $message->from('from@johndoe.com', 'From Name');
+                $message->sender('sender@johndoe.com', 'Sender Name');
+
+                $message->to($email, $name);
+
+                $message->cc('cc@johndoe.com', 'CC Name');
+                $message->bcc('bcc@johndoe.com', 'BCC Name');
+
+                $message->replyTo('reply-to@johndoe.com', 'Reply-To Name');
+
+                $message->subject($subject);
+
+                $message->priority(3);
+            });
+        } catch (Swift_TransportException $e) {
+        }
+
+        $tracker = SentEmail::query()->where('hash', '=','random-hash')->first();
+        $this->assertEquals(config('mail.driver'), $tracker->meta->get('mail_driver'));
+
+
+    }
+
+
     /** @test */
     public function sent_email_model_can_be_created()
     {
