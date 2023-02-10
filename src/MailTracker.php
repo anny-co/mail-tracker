@@ -236,7 +236,7 @@ class MailTracker
     }
 
     /**
-     * Set email header for mailable model to attach the model the the SentEmail model.
+     * Set email header for mailable model to attach the model the SentEmail model.
      *
      * @param Email $email
      * @param Model $mailable
