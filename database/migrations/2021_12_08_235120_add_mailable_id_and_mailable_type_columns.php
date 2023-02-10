@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use jdavidbakr\MailTracker\MailTracker;
 
 class AddMailableIdAndMailableTypeColumns extends Migration
 {
@@ -13,8 +14,7 @@ class AddMailableIdAndMailableTypeColumns extends Migration
      */
     public function up()
     {
-        $model = config('mail-tracker.sent_email_model');
-        Schema::connection((new $model())->getConnectionName())->table('sent_emails', function (Blueprint $table) {
+        Schema::connection(MailTracker::sentEmailModel()->getConnectionName())->table('sent_emails', function (Blueprint $table) {
             $table->nullableMorphs('mailable');
         });
     }
@@ -26,8 +26,7 @@ class AddMailableIdAndMailableTypeColumns extends Migration
      */
     public function down()
     {
-        $model = config('mail-tracker.sent_email_model');
-        Schema::connection((new $model())->getConnectionName())->table('sent_emails', function (Blueprint $table) {
+        Schema::connection(MailTracker::sentEmailModel()->getConnectionName())->table('sent_emails', function (Blueprint $table) {
             $table->dropMorphs('mailable');
         });
     }

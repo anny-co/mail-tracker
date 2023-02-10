@@ -1267,6 +1267,52 @@ class MailTrackerTest extends SetUpTest
     }
 
     /** @test */
+    public function it_sets_mailable_model_from_headers()
+    {
+        Event::fake([
+            EmailSentEvent::class
+        ]);
+
+        $faker = Factory::create();
+        $email = $faker->email;
+        $subject = $faker->sentence;
+        $name = $faker->firstName . ' ' .$faker->lastName;
+
+        \View::addLocation(__DIR__);
+        try {
+            \Mail::send('email.test', [], function ($message) use ($email, $subject, $name) {
+                $message->from('from@johndoe.com', 'From Name');
+                $message->sender('sender@johndoe.com', 'Sender Name');
+
+                $message->to($email, $name);
+
+                $message->cc('cc@johndoe.com', 'CC Name');
+                $message->bcc('bcc@johndoe.com', 'BCC Name');
+
+                $message->replyTo('reply-to@johndoe.com', 'Reply-To Name');
+
+                $message->subject($subject);
+
+                $message->priority(3);
+
+                $message->getHeaders()->addTextHeader('X-Mailable-Id', 1);
+                $message->getHeaders()->addTextHeader('X-Mailable-Type', 'model');
+            });
+        } catch (TransportException $e) {
+        }
+
+        $this->assertDatabaseHas('sent_emails', [
+            'subject' => $subject,
+            'sender_name' => 'From Name',
+            'sender_email' => 'from@johndoe.com',
+            'recipient_name' => $name,
+            'recipient_email' => $email,
+            'mailable_id' => '1',
+            'mailable_type' => 'model',
+        ]);
+    }
+
+    /** @test */
     public function sent_email_model_can_be_created()
     {
         $sentEmail = MailTracker::sentEmailModel();
@@ -1314,45 +1360,4 @@ class SentEmailStub extends Model
 class SentEmailUrlClickedStub extends Model
 {
 
-    public function testMailableRelation()
-    {
-        Event::fake();
-
-        $faker = Factory::create();
-        $email = $faker->email;
-        $subject = $faker->sentence;
-        $name = $faker->firstName . ' ' .$faker->lastName;
-        \View::addLocation(__DIR__);
-        try {
-            \Mail::send('email.test', [], function ($message) use ($email, $subject, $name) {
-                $message->from('from@johndoe.com', 'From Name');
-                $message->sender('sender@johndoe.com', 'Sender Name');
-
-                $message->to($email, $name);
-
-                $message->cc('cc@johndoe.com', 'CC Name');
-                $message->bcc('bcc@johndoe.com', 'BCC Name');
-
-                $message->replyTo('reply-to@johndoe.com', 'Reply-To Name');
-
-                $message->subject($subject);
-
-                $message->priority(3);
-
-                $message->getHeaders()->addTextHeader('X-Mailable-Id', 123);
-                $message->getHeaders()->addTextHeader('X-Mailable-Type', 'orders');
-            });
-        } catch (Swift_TransportException $e) {
-        }
-
-        $this->assertDatabaseHas('sent_emails', [
-            'subject' => $subject,
-            'sender_name' => 'From Name',
-            'sender_email' => 'from@johndoe.com',
-            'recipient_name' => $name,
-            'recipient_email' => $email,
-            'mailable_id' => '123',
-            'mailable_type' => 'orders',
-        ]);
-    }
 }
