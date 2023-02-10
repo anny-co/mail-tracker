@@ -226,15 +226,12 @@ class SentEmail extends Model
         return $this;
     }
 
-    public function fillLogDriver(): static
+    public function fillTrackerDriver(): static
     {
         $meta = collect($this->meta);
 
-        if(config('mail-tracker.log-mail-driver')){
-            $driver = config('mail.driver') ?? config('mail.default');
-
-            $meta->put('mail_driver', $driver);
-        }
+        $driver = config('mail.driver') ?? config('mail.default');
+        $meta->put('mail_driver', $driver);
 
         $this->meta = $meta;
 
@@ -257,4 +254,9 @@ class SentEmail extends Model
     {
         return $this->morphTo('mailable');
     }
+
+    public function getMailDriver() : ?string {
+        return $this->meta?->get('mail_driver');
+    }
+
 }

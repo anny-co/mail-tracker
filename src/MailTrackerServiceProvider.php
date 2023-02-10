@@ -42,7 +42,7 @@ class MailTrackerServiceProvider extends ServiceProvider
 
         // Hook into the mailer
         Event::listen(MessageSending::class, function(MessageSending $event) {
-            $tracker = new MailTracker;
+            $tracker = new MailTracker();
             $tracker->messageSending($event);
         });
         Event::listen(MessageSent::class, function(MessageSent $mail) {

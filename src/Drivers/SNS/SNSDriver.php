@@ -1,23 +1,22 @@
 <?php
 
-namespace jdavidbakr\MailTracker;
-
-use Event;
+namespace jdavidbakr\MailTracker\Drivers\SNS;
 
 use App\Http\Requests;
-use Illuminate\Http\Request;
-use GuzzleHttp\Client as Guzzle;
 use Aws\Sns\Message as SNSMessage;
-use Illuminate\Routing\Controller;
-use jdavidbakr\MailTracker\RecordBounceJob;
-use jdavidbakr\MailTracker\RecordDeliveryJob;
-use jdavidbakr\MailTracker\RecordComplaintJob;
 use Aws\Sns\MessageValidator as SNSMessageValidator;
-use jdavidbakr\MailTracker\Events\EmailDeliveredEvent;
-use jdavidbakr\MailTracker\Events\ComplaintMessageEvent;
-use jdavidbakr\MailTracker\Events\PermanentBouncedMessageEvent;
+use Event;
+use GuzzleHttp\Client as Guzzle;
+use Illuminate\Mail\SentMessage;
+use Illuminate\Routing\Controller;
+use jdavidbakr\MailTracker\MailTrackerDriverController;
+use jdavidbakr\MailTracker\RecordBounceJob;
+use jdavidbakr\MailTracker\RecordComplaintJob;
+use jdavidbakr\MailTracker\RecordDeliveryJob;
+use function jdavidbakr\MailTracker\app;
+use function jdavidbakr\MailTracker\config;
 
-class SNSController extends Controller
+class SNSDriver extends MailTrackerDriverController
 {
     public function callback(Request $request)
     {
@@ -84,4 +83,18 @@ class SNSController extends Controller
         RecordComplaintJob::dispatch($message)
             ->onQueue(config('mail-tracker.tracker-queue'));
     }
+
+    public function resolveMessageId(SentMessage $message): ?string
+    {
+        /** @var \Symfony\Component\Mime\Header\Headers $headers */
+        $headers = $message->getOriginalMessage()->getHeaders();
+
+        if ($messageHeader = $headers->get('X-SES-Message-ID')) {
+            return $messageHeader->getBody();
+        }
+
+        return null;
+    }
+
+
 }

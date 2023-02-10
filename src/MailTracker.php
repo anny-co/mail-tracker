@@ -11,6 +11,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\SentMessage;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
+use jdavidbakr\MailTracker\Contracts\MailTrackerDriver;
 use jdavidbakr\MailTracker\Events\EmailSentEvent;
 use jdavidbakr\MailTracker\Model\SentEmail;
 use jdavidbakr\MailTracker\Model\SentEmailUrlClicked;
@@ -121,46 +122,19 @@ class MailTracker
         $sentEmail = MailTracker::sentEmailModel()->newQuery()->where('hash', $hash)->first();
 
         if ($sentEmail) {
-            $sentEmail->message_id = $this->callMessageIdResolverUsing($sentMessage);
-            $sentEmail->save();
-        }
-    }
+            // Identify the driver the message was sent with
+            /** @var MailTrackerDriver $driver */
+            $driver = MailTrackerManager::driver($sentEmail->getMailDriver());
 
-    public function getMessageIdResolver(): Closure
-    {
-        if (! isset($this->messageIdResolver)) {
-            $this->resolveMessageIdUsing($this->getDefaultMessageIdResolver());
-        }
 
-        return $this->messageIdResolver;
-    }
-
-    public function resolveMessageIdUsing(Closure $resolver): self
-    {
-        $this->messageIdResolver = $resolver;
-        return $this;
-    }
-
-    protected function getDefaultMessageIdResolver(): Closure
-    {
-        return function (SentMessage $message) {
-            /** @var \Symfony\Component\Mime\Header\Headers $headers */
-            $headers = $message->getOriginalMessage()->getHeaders();
-
-            // Laravel supports multiple mail drivers.
-            // We try to guess if this email was sent using SES
-            if ($messageHeader = $headers->get('X-SES-Message-ID')) {
-                return $messageHeader->getBody();
+            $messageId = $driver->resolveMessageId($sentMessage);
+            if($messageId === null) {
+                $messageId = $sentMessage->getMessageId();
             }
 
-            // Second attempt, get the default message ID from symfony mailer
-            return $message->getMessageId();
-        };
-    }
-
-    protected function callMessageIdResolverUsing(SentMessage $message): string
-    {
-        return $this->getMessageIdResolver()(...func_get_args());
+            $sentEmail->message_id = $messageId;
+            $sentEmail->save();
+        }
     }
 
     protected function addTrackers($html, $hash)
@@ -344,7 +318,7 @@ class MailTracker
                     'message_id' => Str::uuid(),
                 ]), function(SentEmail $sentEmail) use ($original_html, $hash, $headers) {
                     $sentEmail->fillContent($original_html, $hash)
-                        ->fillLogDriver()
+                        ->fillTrackerDriver()
                         ->fillMailableModelFromHeaders($headers)
                         ->save();
                 });
