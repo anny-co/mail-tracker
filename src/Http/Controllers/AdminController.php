@@ -1,9 +1,10 @@
 <?php
 
-namespace jdavidbakr\MailTracker;
+namespace jdavidbakr\MailTracker\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use jdavidbakr\MailTracker\MailTracker;
 
 class AdminController extends Controller
 {
