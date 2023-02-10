@@ -7,6 +7,7 @@ use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
+use Illuminate\Mail\Mailable;
 use Illuminate\Mail\SentMessage;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
@@ -237,14 +238,16 @@ class MailTracker
     /**
      * Set email header for mailable model to attach the model the SentEmail model.
      *
-     * @param Email $email
-     * @param Model $mailable
+     * @param Mailable $mailable
+     * @param Model $model
      * @return void
      */
-    public static function attachMailableModel(Email $email, Model $mailable): void
+    public static function attachMailableModel(Mailable $mailable, Model $model): void
     {
-        $email->getHeaders()->addTextHeader('X-Mailable-Id', $mailable->getKey());
-        $email->getHeaders()->addTextHeader('X-Mailable-Type', $mailable->getMorphClass());
+        $mailable->withSymfonyMessage(function($message) use ($model) {
+            $message->getHeaders()->addTextHeader('X-Mailable-Id', $model->getKey());
+            $message->getHeaders()->addTextHeader('X-Mailable-Type', $model->getMorphClass());
+        });
     }
 
     /**

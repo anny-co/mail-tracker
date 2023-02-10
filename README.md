@@ -125,10 +125,22 @@ In some cases you want to override the built-in models. You can do so easily for
 
 ### Mailable Models
 
-You can attach sent emails to any model by utilizing the `HasSentEmails` trait, and calling `attachMailableModel` to create the attachment.
+You can attach sent emails to any model by utilizing the `HasSentEmails` trait, and calling `attachMailableModel` to create the relation.
 
 ```php
-MailTracker::attachMailableModel($email, $mailable);
+MailTracker::attachMailableModel($mailable, $model);
+```
+
+For example, you have a booking for which you send a confirmation email. You can attach this booking to the SentEmail model and know afterwards which emails were sent for a specific booking.
+
+This is how you access the sent emails.
+```php
+class Booking extends Model {
+    use \jdavidbakr\MailTracker\Traits\HasSentEmails;
+}
+
+// access sent emails
+$booking->sentEmails;
 ```
 
 ## Note on dev testing
