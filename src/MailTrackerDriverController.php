@@ -8,6 +8,4 @@ use jdavidbakr\MailTracker\Contracts\MailTrackerDriver;
 abstract class MailTrackerDriverController implements MailTrackerDriver
 {
 
-    public string $id;
-
 }

@@ -7,6 +7,8 @@ use Aws\Sns\Message as SNSMessage;
 use Aws\Sns\MessageValidator as SNSMessageValidator;
 use Event;
 use GuzzleHttp\Client as Guzzle;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Mail\SentMessage;
 use Illuminate\Routing\Controller;
 use jdavidbakr\MailTracker\MailTrackerDriverController;
@@ -18,7 +20,7 @@ use function jdavidbakr\MailTracker\config;
 
 class SNSDriver extends MailTrackerDriverController
 {
-    public function callback(Request $request)
+    public function callback(Request $request) : Response
     {
         if (config('app.env') != 'production' && $request->message) {
             // phpunit cannot mock static methods so without making a facade
@@ -31,7 +33,7 @@ class SNSDriver extends MailTrackerDriverController
         }
         // If we have a topic defined, make sure this is that topic
         if (config('mail-tracker.sns-topic') && $message->offsetGet('TopicArn') != config('mail-tracker.sns-topic')) {
-            return 'invalid topic ARN';
+            return response('invalid topic ARN');
         }
 
         switch ($message->offsetGet('Type')) {
@@ -40,16 +42,18 @@ class SNSDriver extends MailTrackerDriverController
             case 'Notification':
                 return $this->process_notification($message);
         }
+
+        return response('', 204);
     }
 
-    protected function confirm_subscription($message)
+    protected function confirm_subscription($message) : Response
     {
         $client = new Guzzle();
         $client->get($message->offsetGet('SubscribeURL'));
-        return 'subscription confirmed';
+        return response('subscription confirmed');
     }
 
-    protected function process_notification($message)
+    protected function process_notification($message) : Response
     {
         $message = json_decode($message->offsetGet('Message'));
         switch ($message->notificationType) {
@@ -63,7 +67,7 @@ class SNSDriver extends MailTrackerDriverController
                 $this->process_complaint($message);
                 break;
         }
-        return 'notification processed';
+        return response('notification processed');
     }
 
     protected function process_delivery($message)

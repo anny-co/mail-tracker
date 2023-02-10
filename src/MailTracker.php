@@ -2,7 +2,6 @@
 
 namespace jdavidbakr\MailTracker;
 
-use App\Mail\NotificationMailable;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Mail\Events\MessageSending;

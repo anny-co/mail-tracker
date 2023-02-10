@@ -8,7 +8,10 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use jdavidbakr\MailTracker\Contracts\MailTrackerManager;
+use jdavidbakr\MailTracker\Drivers\SNS\SNSDriver;
 use jdavidbakr\MailTracker\Http\Controllers\AdminController;
+use jdavidbakr\MailTracker\Http\Controllers\CallbackController;
 use jdavidbakr\MailTracker\Http\Controllers\MailTrackerController;
 
 class MailTrackerServiceProvider extends ServiceProvider
@@ -100,7 +103,13 @@ class MailTrackerServiceProvider extends ServiceProvider
             Route::get('t/{hash}', [MailTrackerController::class, 'getT'])->name('mailTracker_t');
             Route::get('l/{url}/{hash}', [MailTrackerController::class, 'getL'])->name('mailTracker_l');
             Route::get('n', [MailTrackerController::class, 'getN'])->name('mailTracker_n');
-            Route::post('sns', [SNSController::class, 'callback'])->name('mailTracker_SNS');
+            Route::post('callback/{driver}', CallbackController::class)->name('mailTracker_callback');
+
+            // we keep the sns callback here for backwards compatibility, other drivers will load under callback/
+            // this prevents conflicts where a driver _could_ be called 'n'
+            Route::post('sns', CallbackController::class)
+                ->name('mailTracker_SNS')
+                ->defaults('driverId', 'sns');
         });
 
         // Install the Admin routes
