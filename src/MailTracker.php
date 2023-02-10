@@ -2,6 +2,7 @@
 
 namespace jdavidbakr\MailTracker;
 
+use App\Mail\NotificationMailable;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Mail\Events\MessageSending;
@@ -232,6 +233,19 @@ class MailTracker
     {
         // Replace "/" with "$"
         return str_replace("/", "$", base64_encode($url));
+    }
+
+    /**
+     * Set email header for mailable model to attach the model the the SentEmail model.
+     *
+     * @param Email $email
+     * @param Model $mailable
+     * @return void
+     */
+    public static function attachMailableModel(Email $email, Model $mailable): void
+    {
+        $email->getHeaders()->addTextHeader('X-Mailable-Id', $mailable->getKey());
+        $email->getHeaders()->addTextHeader('X-Mailable-Type', $mailable->getMorphClass());
     }
 
     /**
