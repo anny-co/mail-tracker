@@ -2,11 +2,12 @@
 
 namespace jdavidbakr\MailTracker\Traits;
 
+use jdavidbakr\MailTracker\MailTracker;
+
 trait HasSentEmails
 {
     public function sentEmails()
     {
-        $model = config('mail-tracker.sent_email_model');
-        return $this->morphMany($model, 'mailable');
+        return $this->morphMany(MailTracker::$sentEmailModel, 'mailable');
     }
 }
