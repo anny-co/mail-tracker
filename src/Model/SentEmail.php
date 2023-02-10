@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use jdavidbakr\MailTracker\Concerns\IsSentEmailModel;
 use jdavidbakr\MailTracker\Contracts\SentEmailModel;
+use Symfony\Component\Mime\Header\Headers;
 
 /**
  * @property string $hash
@@ -51,6 +52,33 @@ class SentEmail extends Model implements SentEmailModel
         'clicked_at' => 'datetime',
     ];
 
+
+    public function fillLogDriver(): static
+    {
+        $meta = collect($this->meta);
+
+        if(config('mail-tracker.log-mail-driver')){
+            $driver = config('mail.driver') ?? config('mail.default');
+
+            $meta->put('mail_driver', $driver);
+        }
+
+        $this->meta = $meta;
+
+        return $this;
+    }
+
+    public function fillMailableModelFromHeaders(Headers $headers): static
+    {
+        if ($headers->get('X-Mailable-Id') && $headers->get('X-Mailable-Type')) {
+            $this->mailable_type = $this->getHeader('X-Mailable-Type');
+            $this->mailable_id = $this->getHeader('X-Mailable-Id');
+            $headers->remove('X-Mailable-Type');
+            $headers->remove('X-Mailable-Id');
+        }
+
+        return $this;
+    }
 
     public function mailable()
     {

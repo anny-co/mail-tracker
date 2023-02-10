@@ -1312,8 +1312,11 @@ class MailTrackerTest extends SetUpTest
         ]);
     }
 
-    public function testLogMailDriver(){
-        Event::fake();
+    /** @test */
+    public function it_logs_mail_driver_in_meta(){
+        Event::fake([
+            EmailSentEvent::class
+        ]);
 
         $faker = Factory::create();
         $email = $faker->email;
@@ -1344,13 +1347,11 @@ class MailTrackerTest extends SetUpTest
 
                 $message->priority(3);
             });
-        } catch (Swift_TransportException $e) {
+        } catch (TransportException $e) {
         }
 
         $tracker = SentEmail::query()->where('hash', '=','random-hash')->first();
-        $this->assertEquals(config('mail.driver'), $tracker->meta->get('mail_driver'));
-
-
+        $this->assertEquals('smtp', $tracker->meta->get('mail_driver'));
     }
 
 
