@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Mail\SentMessage;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\Http;
 use jdavidbakr\MailTracker\MailTrackerDriverController;
 use jdavidbakr\MailTracker\RecordBounceJob;
 use jdavidbakr\MailTracker\RecordComplaintJob;
@@ -48,8 +49,7 @@ class SNSDriver extends MailTrackerDriverController
 
     protected function confirm_subscription($message) : Response
     {
-        $client = new Guzzle();
-        $client->get($message->offsetGet('SubscribeURL'));
+        Http::get($message->offsetGet('SubscribeURL'));
         return response('subscription confirmed');
     }
 
