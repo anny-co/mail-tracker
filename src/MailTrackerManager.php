@@ -5,7 +5,6 @@ namespace jdavidbakr\MailTracker;
 
 use Illuminate\Support\Manager;
 use jdavidbakr\MailTracker\Contracts\MailTrackerDriver;
-use jdavidbakr\MailTracker\Drivers\Mailgun\MailgunDriver;
 use jdavidbakr\MailTracker\Drivers\SMTP\SMTPDriver;
 use jdavidbakr\MailTracker\Drivers\SNS\SNSDriver;
 
@@ -29,14 +28,6 @@ class MailTrackerManager extends Manager
      */
     public function createSnsDriver(): MailTrackerDriver {
         return new SNSDriver();
-    }
-
-    /**
-     * @return MailgunDriver
-     */
-    public function createMailgunDriver(): MailTrackerDriver
-    {
-        return new MailgunDriver();
     }
 
 }
