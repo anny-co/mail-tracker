@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use jdavidbakr\MailTracker\MailTracker;
+use Symfony\Component\Mime\Header\Headers;
 
 /**
  * @property string $hash
@@ -178,18 +179,18 @@ class SentEmail extends Model
         return $this->hasMany(MailTracker::$sentEmailUrlClickedModel);
     }
 
-    public function fillContent(string $originalHtml, string $hash)
+    public function fillContent(string $originalHtml, string $hash): static
     {
         $logContent = config('mail-tracker.log-content', true);
 
         if(!$logContent) {
-            return;
+            return $this;
         }
 
         $logContentStrategy = config('mail-tracker.log-content-strategy', 'database');
 
         if(!in_array($logContentStrategy, ['database', 'filesystem'])) {
-            return;
+            return $this;
         }
 
         $databaseContent = null;
@@ -221,6 +222,35 @@ class SentEmail extends Model
         }
 
         $this->content = $databaseContent;
+
+        return $this;
+    }
+
+    public function fillLogDriver(): static
+    {
+        $meta = collect($this->meta);
+
+        if(config('mail-tracker.log-mail-driver')){
+            $driver = config('mail.driver') ?? config('mail.default');
+
+            $meta->put('mail_driver', $driver);
+        }
+
+        $this->meta = $meta;
+
+        return $this;
+    }
+
+    public function fillMailableModelFromHeaders(Headers $headers): static
+    {
+        if ($headers->get('X-Mailable-Id') && $headers->get('X-Mailable-Type')) {
+            $this->mailable_type = $this->getHeader('X-Mailable-Type');
+            $this->mailable_id = $this->getHeader('X-Mailable-Id');
+            $headers->remove('X-Mailable-Type');
+            $headers->remove('X-Mailable-Id');
+        }
+
+        return $this;
     }
 
     public function mailable()

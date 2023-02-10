@@ -343,17 +343,10 @@ class MailTracker
                     'clicks' => 0,
                     'message_id' => Str::uuid(),
                 ]), function(SentEmail $sentEmail) use ($original_html, $hash, $headers) {
-                    $sentEmail->fillContent($original_html, $hash);
-
-                    // extract mailable linking info
-                    if ($headers->get('X-Mailable-Id') && $headers->get('X-Mailable-Type')) {
-                        $sentEmail->mailable_type = $sentEmail->getHeader('X-Mailable-Type');
-                        $sentEmail->mailable_id = $sentEmail->getHeader('X-Mailable-Id');
-                        $headers->remove('X-Mailable-Type');
-                        $headers->remove('X-Mailable-Id');
-                    }
-
-                    $sentEmail->save();
+                    $sentEmail->fillContent($original_html, $hash)
+                        ->fillLogDriver()
+                        ->fillMailableModelFromHeaders($headers)
+                        ->save();
                 });
 
                 Event::dispatch(new EmailSentEvent($tracker));
