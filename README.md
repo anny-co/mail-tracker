@@ -143,6 +143,14 @@ class OwnEmailSentModel extends Model implements SentEmailModel {
 }
 ```
 
+### Mailable Models
+
+You can attach sent emails to any model by utilizing the `HasSentEmails` trait, and calling `attachMailableModel` to create the attachment.
+
+```php
+MailTracker::attachMailableModel($email, $mailable);
+```
+
 ## Note on dev testing
 
 Several people have reported the tracking pixel not working while they were testing. What is happening with the tracking pixel is that the email client is connecting to your website to log the view. In order for this to happen, images have to be visible in the client, and the client has to be able to connect to your server.
