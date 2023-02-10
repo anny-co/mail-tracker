@@ -12,10 +12,10 @@ use jdavidbakr\MailTracker\MailTrackerManager;
 class CallbackController extends Controller
 {
 
-    public function __invoke(Request $request, string $driverId, MailTrackerManager $manager) : Response
+    public function __invoke(Request $request, string $driver, MailTrackerManager $manager) : Response
     {
         /** @var MailTrackerDriver $driver */
-        $driver = $manager->driver($driverId);
+        $driver = $manager->driver($driver);
 
         if(!$driver) {
             abort(404);
