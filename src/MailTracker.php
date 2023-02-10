@@ -126,7 +126,6 @@ class MailTracker
             /** @var MailTrackerDriver $driver */
             $driver = MailTrackerManager::driver($sentEmail->getMailDriver());
 
-
             $messageId = $driver->resolveMessageId($sentMessage);
             if($messageId === null) {
                 $messageId = $sentMessage->getMessageId();
