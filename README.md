@@ -163,6 +163,26 @@ class Booking extends Model {
 $booking->sentEmails;
 ```
 
+### Mailable Models
+
+You can attach sent emails to any model by utilizing the `HasSentEmails` trait, and calling `attachMailableModel` to create the relation.
+
+```php
+MailTracker::attachMailableModel($mailable, $model);
+```
+
+For example, you have a booking for which you send a confirmation email. You can attach this booking to the SentEmail model and know afterwards which emails were sent for a specific booking.
+
+This is how you access the sent emails.
+```php
+class Booking extends Model {
+    use \jdavidbakr\MailTracker\Traits\HasSentEmails;
+}
+
+// access sent emails
+$booking->sentEmails;
+```
+
 ## Note on dev testing
 
 Several people have reported the tracking pixel not working while they were testing. What is happening with the tracking pixel is that the email client is connecting to your website to log the view. In order for this to happen, images have to be visible in the client, and the client has to be able to connect to your server.
