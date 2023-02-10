@@ -1,6 +1,7 @@
 <?php
 
 return [
+
     /**
      * To disable the pixel injection, set this to false.
      */
