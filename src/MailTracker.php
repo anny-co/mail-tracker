@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\SentMessage;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use jdavidbakr\MailTracker\Contracts\MailTrackerDriver;
 use jdavidbakr\MailTracker\Contracts\SentEmailModel;
@@ -26,11 +26,6 @@ class MailTracker
     // Set this to "false" to skip this library migrations
     public static $runsMigrations = true;
 
-    protected $hash;
-
-    // Allow developers to provide their own
-    protected Closure $messageIdResolver;
-
     /**
      * The SentEmail model class name.
      *
@@ -44,6 +39,7 @@ class MailTracker
      * @var string
      */
     public static string $sentEmailUrlClickedModel = SentEmailUrlClicked::class;
+    protected $hash;
 
     /**
      * Configure this library to not register its migrations.
@@ -100,6 +96,14 @@ class MailTracker
         return new static::$sentEmailUrlClickedModel($attributes);
     }
 
+    public function __construct(protected MailTrackerManager $manager)
+    {
+    }
+
+    public static function make(): static {
+        return app()->make(static::class);
+    }
+
     /**
      * Inject the tracking code into the message
      */
@@ -124,7 +128,7 @@ class MailTracker
         if ($sentEmail) {
             // Identify the driver the message was sent with
             /** @var MailTrackerDriver $driver */
-            $driver = MailTrackerManager::driver($sentEmail->getMailDriver());
+            $driver = $this->manager->driver($sentEmail->mailer);
 
             $messageId = $driver->resolveMessageId($sentMessage);
             if($messageId === null) {

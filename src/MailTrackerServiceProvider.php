@@ -8,8 +8,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use jdavidbakr\MailTracker\Contracts\MailTrackerManager;
-use jdavidbakr\MailTracker\Drivers\SNS\SNSDriver;
 use jdavidbakr\MailTracker\Http\Controllers\AdminController;
 use jdavidbakr\MailTracker\Http\Controllers\CallbackController;
 use jdavidbakr\MailTracker\Http\Controllers\MailTrackerController;
@@ -36,12 +34,10 @@ class MailTrackerServiceProvider extends ServiceProvider
 
         // Hook into the mailer
         Event::listen(MessageSending::class, function(MessageSending $event) {
-            $tracker = new MailTracker();
-            $tracker->messageSending($event);
+            $this->app->make(MailTracker::class)->messageSending($event);
         });
         Event::listen(MessageSent::class, function(MessageSent $mail) {
-            $tracker = new MailTracker;
-            $tracker->messageSent($mail);
+            $this->app->make(MailTracker::class)->messageSent($mail);
         });
 
         // Install the routes
@@ -55,7 +51,14 @@ class MailTrackerServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->scoped(MailTrackerManager::class, function($app){
+            return new MailTrackerManager($app);
+        });
+        $this->app->scoped(MailTracker::class, function($app) {
+            return new MailTracker(
+                $this->app->make(MailTrackerManager::class)
+            );
+        });
     }
 
     /**
@@ -109,7 +112,7 @@ class MailTrackerServiceProvider extends ServiceProvider
             // this prevents conflicts where a driver _could_ be called 'n'
             Route::post('sns', CallbackController::class)
                 ->name('mailTracker_SNS')
-                ->defaults('driverId', 'sns');
+                ->defaults('driver', 'ses');
         });
 
         // Install the Admin routes

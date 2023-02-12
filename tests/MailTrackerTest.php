@@ -22,6 +22,7 @@ use Illuminate\Support\Str;
 use jdavidbakr\MailTracker\Events\EmailSentEvent;
 use jdavidbakr\MailTracker\Events\LinkClickedEvent;
 use jdavidbakr\MailTracker\Exceptions\BadUrlLink;
+use jdavidbakr\MailTracker\Http\Controllers\CallbackController;
 use jdavidbakr\MailTracker\MailTracker;
 use jdavidbakr\MailTracker\Model\SentEmail;
 use jdavidbakr\MailTracker\Model\SentEmailUrlClicked;
@@ -559,7 +560,7 @@ class MailTrackerTest extends SetUpTest
             ]),
             'getMessageId'=>'native-id',
         ]);
-        $tracker = new MailTracker();
+        $tracker = MailTracker::make();
 
         $tracker->messageSending($sendingEvent);
         $tracker->messageSent($sentEvent);
@@ -573,7 +574,7 @@ class MailTrackerTest extends SetUpTest
     /**
      * @test
      */
-    public function it_retrieves_the_mesage_id_from_ses_mail_default()
+    public function it_retrieves_the_message_id_from_ses_mail_default()
     {
         Config::set('mail.default', 'ses');
         Config::set('mail.driver', null);
@@ -616,7 +617,7 @@ class MailTrackerTest extends SetUpTest
                 'getHeaders'=>$headers
             ]),
         ]);
-        $tracker = new MailTracker();
+        $tracker = MailTracker::make();
 
         $tracker->messageSending($sendingEvent);
         $tracker->messageSent($sentEvent);
@@ -630,7 +631,7 @@ class MailTrackerTest extends SetUpTest
     /**
      * @test
      */
-    public function it_retrieves_the_mesage_id_from_ses_mail_driver()
+    public function it_retrieves_the_message_id_from_ses_mail_driver()
     {
         $str = Mockery::mock(Str::class);
         app()->instance(Str::class, $str);
@@ -678,7 +679,7 @@ class MailTrackerTest extends SetUpTest
                 'getHeaders'=>$headers
             ]),
         ]);
-        $tracker = new MailTracker();
+        $tracker = MailTracker::make();
 
         $tracker->messageSending($sendingEvent);
         $tracker->messageSent($sentEvent);
@@ -698,7 +699,7 @@ class MailTrackerTest extends SetUpTest
      */
     public function it_confirms_a_subscription()
     {
-        $url = action('\jdavidbakr\MailTracker\SNSController@callback');
+        $url = route('mailTracker_SNS');
         $response = $this->post($url, [
                 'message' => json_encode([
                         // Required
@@ -725,7 +726,7 @@ class MailTrackerTest extends SetUpTest
     {
         $topic = Str::random(32);
         Config::set('mail-tracker.sns-topic', $topic);
-        $url = action('\jdavidbakr\MailTracker\SNSController@callback');
+        $url = route('mailTracker_SNS');
         $response = $this->post($url, [
                 'message' => json_encode([
                         // Required
@@ -752,7 +753,8 @@ class MailTrackerTest extends SetUpTest
     {
         $topic = Str::random(32);
         Config::set('mail-tracker.sns-topic', $topic);
-        $url = action('\jdavidbakr\MailTracker\SNSController@callback');
+
+        $url = action([CallbackController::class], ['driver' => 'sns']);
         $response = $this->post($url, [
                 'message' => json_encode([
                         // Required
@@ -783,7 +785,7 @@ class MailTrackerTest extends SetUpTest
             'notificationType' => 'Delivery',
         ];
 
-        $response = $this->post(action('\jdavidbakr\MailTracker\SNSController@callback'), [
+        $response = $this->post(route('mailTracker_SNS'), [
                 'message' => json_encode([
                     'Message' => json_encode($message),
                     'MessageId' => Str::uuid(),
@@ -814,7 +816,7 @@ class MailTrackerTest extends SetUpTest
             'notificationType' => 'Bounce',
         ];
 
-        $response = $this->post(action('\jdavidbakr\MailTracker\SNSController@callback'), [
+        $response = $this->post(route('mailTracker_SNS'), [
                 'message' => json_encode([
                     'Message' => json_encode($message),
                     'MessageId' => Str::uuid(),
@@ -845,7 +847,7 @@ class MailTrackerTest extends SetUpTest
             'notificationType' => 'Complaint',
         ];
 
-        $response = $this->post(action('\jdavidbakr\MailTracker\SNSController@callback'), [
+        $response = $this->post(route('mailTracker_SNS'), [
                 'message' => json_encode([
                     'Message' => json_encode($message),
                     'MessageId' => Str::uuid(),

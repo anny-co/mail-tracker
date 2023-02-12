@@ -1,25 +1,20 @@
 <?php
 
-namespace jdavidbakr\MailTracker\Drivers\SNS;
+namespace jdavidbakr\MailTracker\Drivers;
 
-use App\Http\Requests;
 use Aws\Sns\Message as SNSMessage;
 use Aws\Sns\MessageValidator as SNSMessageValidator;
-use Event;
-use GuzzleHttp\Client as Guzzle;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Mail\SentMessage;
-use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Http;
-use jdavidbakr\MailTracker\MailTrackerDriverController;
+use jdavidbakr\MailTracker\Contracts\MailTrackerDriver;
 use jdavidbakr\MailTracker\RecordBounceJob;
 use jdavidbakr\MailTracker\RecordComplaintJob;
 use jdavidbakr\MailTracker\RecordDeliveryJob;
-use function jdavidbakr\MailTracker\app;
-use function jdavidbakr\MailTracker\config;
 
-class SNSDriver extends MailTrackerDriverController
+
+class SNSDriver implements MailTrackerDriver
 {
     public function callback(Request $request) : Response
     {
@@ -45,6 +40,18 @@ class SNSDriver extends MailTrackerDriverController
         }
 
         return response('', 204);
+    }
+
+    public function resolveMessageId(SentMessage $message): ?string
+    {
+        /** @var \Symfony\Component\Mime\Header\Headers $headers */
+        $headers = $message->getOriginalMessage()->getHeaders();
+
+        if ($messageHeader = $headers->get('X-SES-Message-ID')) {
+            return $messageHeader->getBody();
+        }
+
+        return null;
     }
 
     protected function confirm_subscription($message) : Response
@@ -87,18 +94,4 @@ class SNSDriver extends MailTrackerDriverController
         RecordComplaintJob::dispatch($message)
             ->onQueue(config('mail-tracker.tracker-queue'));
     }
-
-    public function resolveMessageId(SentMessage $message): ?string
-    {
-        /** @var \Symfony\Component\Mime\Header\Headers $headers */
-        $headers = $message->getOriginalMessage()->getHeaders();
-
-        if ($messageHeader = $headers->get('X-SES-Message-ID')) {
-            return $messageHeader->getBody();
-        }
-
-        return null;
-    }
-
-
 }

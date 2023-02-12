@@ -5,15 +5,16 @@ namespace jdavidbakr\MailTracker;
 
 use Illuminate\Support\Manager;
 use jdavidbakr\MailTracker\Contracts\MailTrackerDriver;
-use jdavidbakr\MailTracker\Drivers\SMTP\SMTPDriver;
-use jdavidbakr\MailTracker\Drivers\SNS\SNSDriver;
+use jdavidbakr\MailTracker\Drivers\LocalDriver;
+use jdavidbakr\MailTracker\Drivers\SMTPDriver;
+use jdavidbakr\MailTracker\Drivers\SNSDriver;
 
 class MailTrackerManager extends Manager
 {
 
     public function getDefaultDriver(): string
     {
-        return 'smtp';
+        return 'ses';
     }
 
     /**
@@ -23,6 +24,25 @@ class MailTrackerManager extends Manager
         return new SMTPDriver();
     }
 
+    public function createArrayDriver()
+    {
+        return new LocalDriver();
+    }
+
+    public function createLogDriver()
+    {
+        return new LocalDriver();
+    }
+
+    /**
+     * TODO: Need to test how to work with failover driver
+     * @return LocalDriver
+     */
+    public function createFailoverDriver()
+    {
+        return new LocalDriver();
+    }
+
     /**
      * @return SNSDriver
      */
@@ -30,4 +50,11 @@ class MailTrackerManager extends Manager
         return new SNSDriver();
     }
 
+    /**
+     * @return SNSDriver
+     */
+    public function createSesDriver()
+    {
+        return new SNSDriver();
+    }
 }

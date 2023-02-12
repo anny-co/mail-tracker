@@ -1,14 +1,13 @@
 <?php
-declare(strict_types=1);
 
-namespace jdavidbakr\MailTracker\Drivers\SMTP;
+namespace jdavidbakr\MailTracker\Drivers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Mail\SentMessage;
-use jdavidbakr\MailTracker\MailTrackerDriverController;
+use jdavidbakr\MailTracker\Contracts\MailTrackerDriver;
 
-class SMTPDriver extends MailTrackerDriverController
+class LocalDriver implements MailTrackerDriver
 {
 
     public function callback(Request $request) : Response
