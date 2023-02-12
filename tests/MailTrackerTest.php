@@ -528,6 +528,7 @@ class MailTrackerTest extends SetUpTest
         $headers = new Headers;
         $headers->addHeader('X-Mailer-Hash', $sent->hash);
         $sendingEvent = Mockery::mock(MessageSending::class);
+        $sendingEvent->data = [];
         $sendingEvent->message = Mockery::mock(Email::class, [
                 'getTo' => [
                     Mockery::mock([
@@ -553,6 +554,7 @@ class MailTrackerTest extends SetUpTest
                 'getId' => 'message-id',
                 'getHtmlCharset' => 'utf-8',
             ]);
+
         $sentEvent = Mockery::mock(MessageSent::class);
         $sentEvent->sent = Mockery::mock(SentMessage::class, [
             'getOriginalMessage'=>Mockery::mock([
@@ -586,6 +588,7 @@ class MailTrackerTest extends SetUpTest
         $headers->addHeader('X-Mailer-Hash', $sent->hash);
         $headers->addHeader('X-SES-Message-ID', 'aws-mailer-hash');
         $sendingEvent = Mockery::mock(MessageSending::class);
+        $sendingEvent->data = [];
         $sendingEvent->message = Mockery::mock(Email::class, [
                 'getTo' => [
                     Mockery::mock([
@@ -648,6 +651,7 @@ class MailTrackerTest extends SetUpTest
         $headers->addHeader('X-Mailer-Hash', $sent->hash);
         $headers->addHeader('X-SES-Message-ID', 'aws-mailer-hash');
         $sendingEvent = Mockery::mock(MessageSending::class);
+        $sendingEvent->data = [];
         $sendingEvent->message = Mockery::mock(Email::class, [
                 'getTo' => [
                     Mockery::mock([

@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use jdavidbakr\MailTracker\Contracts\MailerResolver;
 use jdavidbakr\MailTracker\Http\Controllers\AdminController;
 use jdavidbakr\MailTracker\Http\Controllers\CallbackController;
 use jdavidbakr\MailTracker\Http\Controllers\MailTrackerController;
@@ -51,14 +52,16 @@ class MailTrackerServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->scoped(MailerResolver::class, MailTrackerMailerResolver::class);
         $this->app->scoped(MailTrackerManager::class, function($app){
             return new MailTrackerManager($app);
         });
-        $this->app->scoped(MailTracker::class, function($app) {
-            return new MailTracker(
-                $this->app->make(MailTrackerManager::class)
-            );
-        });
+//        $this->app->scoped(MailTracker::class, function($app) {
+//            return new MailTracker(
+//                $this->app->make(MailTrackerManager::class),
+//                $this->app->make(MailerResolver::class),
+//            );
+//        });
     }
 
     /**

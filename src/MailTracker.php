@@ -10,6 +10,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use jdavidbakr\MailTracker\Contracts\MailerResolver;
 use jdavidbakr\MailTracker\Contracts\MailTrackerDriver;
 use jdavidbakr\MailTracker\Contracts\SentEmailModel;
 use jdavidbakr\MailTracker\Events\EmailSentEvent;
@@ -39,6 +40,16 @@ class MailTracker
      * @var string
      */
     public static string $sentEmailUrlClickedModel = SentEmailUrlClicked::class;
+
+
+    /**
+     * This is used for resolving the mailer during a message send.
+     * Read more in the docs.
+     *
+     * @var string|null
+     */
+    public static string|null $mailer = null;
+
     protected $hash;
 
     /**
@@ -50,7 +61,7 @@ class MailTracker
     {
         static::$runsMigrations = false;
 
-        return new static;
+        return static::make();
     }
 
     /**
@@ -61,6 +72,11 @@ class MailTracker
      */
     public static function useSentEmailModel(string $sentEmailModelClass): void {
         static::$sentEmailModel = $sentEmailModelClass;
+    }
+
+    public static function usedMailer(string|null $mailer)
+    {
+        static::$mailer = $mailer;
     }
 
     /**
@@ -96,7 +112,7 @@ class MailTracker
         return new static::$sentEmailUrlClickedModel($attributes);
     }
 
-    public function __construct(protected MailTrackerManager $manager)
+    public function __construct(protected MailTrackerManager $manager, protected MailerResolver $resolver)
     {
     }
 
@@ -111,8 +127,10 @@ class MailTracker
     {
         $message = $event->message;
 
+
         // Create the trackers
-        $this->createTrackers($message);
+        $mailer = $this->resolver->resolve($event->data);
+        $this->createTrackers($message, $mailer);
 
         // Purge old records
         $this->purgeOldRecords();
@@ -233,7 +251,7 @@ class MailTracker
      * @param  Email $message
      * @return void
      */
-    protected function createTrackers(Email $message)
+    protected function createTrackers(Email $message, string $mailer): void
     {
         foreach ($message->getTo() as $toAddress) {
             $to_email = $toAddress->getAddress();
@@ -319,10 +337,10 @@ class MailTracker
                     'opens' => 0,
                     'clicks' => 0,
                     'message_id' => Str::uuid(),
-                ]), function(Model|SentEmailModel $sentEmail) use ($original_html, $hash, $headers) {
+                ]), function(Model|SentEmailModel $sentEmail) use ($original_html, $hash, $headers, $mailer) {
                     $sentEmail
+                        ->setAttribute('mailer', $mailer)
                         ->fillContent($original_html, $hash)
-                        ->fillMailer()
                         ->fillMailableModelFromHeaders($headers)
                         ->save();
                 });

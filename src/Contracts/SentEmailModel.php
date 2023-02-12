@@ -14,6 +14,5 @@ interface SentEmailModel
     public function getAllHeaders();
     public function getHeader(string $key);
     public function fillContent(string $originalHtml, string $hash): static;
-    public function fillMailer(): static;
     public function fillMailableModelFromHeaders(Headers $headers): static;
 }

@@ -93,14 +93,6 @@ trait IsSentEmailModel
         return $this->getAllHeaders()->get($key);
     }
 
-    public function fillMailer(): static
-    {
-        // TODO: We will change this after
-        $this->mailer = config('mail.driver') ?? config('mail.default');
-
-        return $this;
-    }
-
     public function fillMailableModelFromHeaders(Headers $headers): static
     {
         if ($headers->get('X-Mailable-Id') && $headers->get('X-Mailable-Type')) {
