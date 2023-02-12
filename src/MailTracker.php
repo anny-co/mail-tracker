@@ -316,8 +316,9 @@ class MailTracker
                     'clicks' => 0,
                     'message_id' => Str::uuid(),
                 ]), function(Model|SentEmailModel $sentEmail) use ($original_html, $hash, $headers) {
-                    $sentEmail->fillContent($original_html, $hash)
-                        ->fillTrackerDriver()
+                    $sentEmail
+                        ->fillContent($original_html, $hash)
+                        ->fillMailer()
                         ->fillMailableModelFromHeaders($headers)
                         ->save();
                 });

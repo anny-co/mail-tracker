@@ -51,39 +51,4 @@ class SentEmail extends Model implements SentEmailModel
         'opened_at' => 'datetime',
         'clicked_at' => 'datetime',
     ];
-
-
-    public function fillTrackerDriver(): static
-    {
-        $meta = collect($this->meta);
-
-        $driver = config('mail.driver') ?? config('mail.default');
-        $meta->put('mail_driver', $driver);
-
-        $this->meta = $meta;
-
-        return $this;
-    }
-
-    public function fillMailableModelFromHeaders(Headers $headers): static
-    {
-        if ($headers->get('X-Mailable-Id') && $headers->get('X-Mailable-Type')) {
-            $this->mailable_type = $this->getHeader('X-Mailable-Type');
-            $this->mailable_id = $this->getHeader('X-Mailable-Id');
-            $headers->remove('X-Mailable-Type');
-            $headers->remove('X-Mailable-Id');
-        }
-
-        return $this;
-    }
-
-    public function mailable()
-    {
-        return $this->morphTo('mailable');
-    }
-
-    public function getMailDriver() : ?string {
-        return $this->meta?->get('mail_driver');
-    }
-
 }
