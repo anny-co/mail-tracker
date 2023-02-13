@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use jdavidbakr\MailTracker\Console\Commands\PurgeSentEmailsCommand;
 use jdavidbakr\MailTracker\Contracts\MailerResolver;
 use jdavidbakr\MailTracker\Http\Controllers\AdminController;
 use jdavidbakr\MailTracker\Http\Controllers\CallbackController;
@@ -92,6 +93,7 @@ class MailTrackerServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
+                PurgeSentEmailsCommand::class,
                 Console\MigrateRecipients::class,
             ]);
         }

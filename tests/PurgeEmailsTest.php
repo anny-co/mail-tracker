@@ -6,8 +6,10 @@ use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use jdavidbakr\MailTracker\EmailsPurger;
 use jdavidbakr\MailTracker\Jobs\PurgeSentEmailsJob;
 use jdavidbakr\MailTracker\MailTracker;
 
@@ -50,8 +52,51 @@ class PurgeEmailsTest extends SetUpTest
 
         $this->travelTo(now()->addDay()->addMinute());
 
+        $purger = new EmailsPurger();
+        $purger->purge(1);
+
+        $this->assertNull($oldSentEmail->fresh());
+        $this->assertNull($oldUrlClicked->fresh());
+    }
+
+    /** @test */
+    public function job_purges_old_emails()
+    {
+        config()->set('mail-tracker.expire-days', 1);
+        list($oldSentEmail, $oldUrlClicked) = $this->createEmailAndClick();
+
+        $this->travelTo(now()->addDay()->addMinute());
+
         $job = new PurgeSentEmailsJob();
-        $job->handle();
+        Bus::dispatchSync($job);
+
+        $this->assertNull($oldSentEmail->fresh());
+        $this->assertNull($oldUrlClicked->fresh());
+    }
+
+    /** @test */
+    public function command_purges_old_emails()
+    {
+        config()->set('mail-tracker.expire-days', 1);
+        list($oldSentEmail, $oldUrlClicked) = $this->createEmailAndClick();
+
+        $this->travelTo(now()->addDay()->addMinute());
+
+        $this->artisan('mail-tracker:purge');
+
+        $this->assertNull($oldSentEmail->fresh());
+        $this->assertNull($oldUrlClicked->fresh());
+    }
+
+    /** @test */
+    public function command_overrides_expire_days()
+    {
+        config()->set('mail-tracker.expire-days', 10);
+        list($oldSentEmail, $oldUrlClicked) = $this->createEmailAndClick();
+
+        $this->travelTo(now()->addDays(2)->addMinute());
+
+        $this->artisan('mail-tracker:purge --expire-days=2');
 
         $this->assertNull($oldSentEmail->fresh());
         $this->assertNull($oldUrlClicked->fresh());
@@ -65,8 +110,8 @@ class PurgeEmailsTest extends SetUpTest
 
         $this->travelTo(now()->addDay()->subMinute());
 
-        $job = new PurgeSentEmailsJob();
-        $job->handle();
+        $purger = new EmailsPurger();
+        $purger->purge(1);
 
         $this->assertNotNull($oldSentEmail->fresh());
         $this->assertNotNull($oldUrlClicked->fresh());
@@ -80,8 +125,8 @@ class PurgeEmailsTest extends SetUpTest
 
         $this->travelTo(now()->addDay()->addMinute());
 
-        $job = new PurgeSentEmailsJob();
-        $job->handle();
+        $purger = new EmailsPurger();
+        $purger->purge();
 
         $this->assertNotNull($oldSentEmail->fresh());
         $this->assertNotNull($oldUrlClicked->fresh());
@@ -99,9 +144,8 @@ class PurgeEmailsTest extends SetUpTest
 
         $this->travelTo(now()->addDay()->addMinute());
 
-        $job = new PurgeSentEmailsJob();
-        $job->handle();
-
+        $purger = new EmailsPurger();
+        $purger->purge();
 
         $this->assertNull($oldSentEmail->fresh());
         $this->assertNull($oldUrlClicked->fresh());
@@ -133,8 +177,8 @@ class PurgeEmailsTest extends SetUpTest
 
         $this->travelTo(now()->addDay()->addMinute());
 
-        $job = new PurgeSentEmailsJob();
-        $job->handle();
+        $purger = new EmailsPurger();
+        $purger->purge();
 
         Storage::assertMissing($filePath);
     }
