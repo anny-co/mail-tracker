@@ -2,10 +2,8 @@
 
 namespace jdavidbakr\MailTracker;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 use jdavidbakr\MailTracker\Contracts\MailerResolver;
-use jdavidbakr\MailTracker\Contracts\SentEmailModel;
 
 class MailTrackerMailerResolver implements MailerResolver
 {

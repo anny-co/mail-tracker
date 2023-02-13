@@ -20,16 +20,17 @@ class MailTrackerManager extends Manager
     /**
      * @return SMTPDriver
      */
-    public function createSmtpDriver(): MailTrackerDriver {
+    public function createSmtpDriver(): MailTrackerDriver
+    {
         return new SMTPDriver();
     }
 
-    public function createArrayDriver()
+    public function createArrayDriver(): MailTrackerDriver
     {
         return new LocalDriver();
     }
 
-    public function createLogDriver()
+    public function createLogDriver(): MailTrackerDriver
     {
         return new LocalDriver();
     }
@@ -38,7 +39,7 @@ class MailTrackerManager extends Manager
      * TODO: Need to test how to work with failover driver
      * @return LocalDriver
      */
-    public function createFailoverDriver()
+    public function createFailoverDriver(): MailTrackerDriver
     {
         return new LocalDriver();
     }
@@ -46,14 +47,15 @@ class MailTrackerManager extends Manager
     /**
      * @return SNSDriver
      */
-    public function createSnsDriver(): MailTrackerDriver {
+    public function createSnsDriver(): MailTrackerDriver
+    {
         return new SNSDriver();
     }
 
     /**
      * @return SNSDriver
      */
-    public function createSesDriver()
+    public function createSesDriver(): MailTrackerDriver
     {
         return new SNSDriver();
     }
