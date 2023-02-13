@@ -75,13 +75,6 @@ class MailTrackerTest extends SetUpTest
         Config::set('mail-tracker.inject-pixel', 1);
         Config::set('mail-tracker.track-links', 1);
 
-        $old_email = MailTracker::sentEmailModel()->newQuery()->create([
-                'hash' => Str::random(32),
-            ]);
-        $old_url = MailTracker::sentEmailUrlClickedModel()->newQuery()->create([
-                'sent_email_id' => $old_email->id,
-                'hash' => Str::random(32),
-            ]);
         // Go into the future to make sure that the old email gets removed
         \Carbon\Carbon::setTestNow(\Carbon\Carbon::now()->addWeek());
         $str = Mockery::mock(Str::class);
@@ -135,8 +128,6 @@ class MailTrackerTest extends SetUpTest
         ])->first();
         $this->assertEquals($name.' <'.$email.'>', $sent_email->recipient);
         $this->assertEquals('From Name <from@johndoe.com>', $sent_email->sender);
-        $this->assertNull($old_email->fresh());
-        $this->assertNull($old_url->fresh());
     }
 
     public function testSendMessageWithMailRaw()
@@ -1125,18 +1116,10 @@ class MailTrackerTest extends SetUpTest
     {
         // Create an old email to purge
         Config::set('mail-tracker.expire-days', 1);
-
         Config::set('mail-tracker.connection', 'secondary');
         $this->app['migrator']->setConnection('secondary');
         $this->artisan('migrate', ['--database' => 'secondary']);
 
-        $old_email = MailTracker::sentEmailModel()->newQuery()->create([
-            'hash' => Str::random(32),
-        ]);
-        $old_url = MailTracker::sentEmailUrlClickedModel()->newQuery()->create([
-            'sent_email_id' => $old_email->id,
-            'hash' => Str::random(32),
-        ]);
         // Go into the future to make sure that the old email gets removed
         \Carbon\Carbon::setTestNow(\Carbon\Carbon::now()->addWeek());
 
@@ -1177,8 +1160,6 @@ class MailTrackerTest extends SetUpTest
             'sender_email' => 'from@johndoe.com',
             'subject' => $subject,
         ], 'secondary');
-        $this->assertNull($old_email->fresh());
-        $this->assertNull($old_url->fresh());
     }
 
     /**

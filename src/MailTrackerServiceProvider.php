@@ -2,6 +2,7 @@
 
 namespace jdavidbakr\MailTracker;
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Mail\Events\MessageSent;
 use Illuminate\Support\Arr;
@@ -12,6 +13,7 @@ use jdavidbakr\MailTracker\Contracts\MailerResolver;
 use jdavidbakr\MailTracker\Http\Controllers\AdminController;
 use jdavidbakr\MailTracker\Http\Controllers\CallbackController;
 use jdavidbakr\MailTracker\Http\Controllers\MailTrackerController;
+use jdavidbakr\MailTracker\Jobs\PurgeSentEmailsJob;
 
 class MailTrackerServiceProvider extends ServiceProvider
 {
@@ -32,6 +34,9 @@ class MailTrackerServiceProvider extends ServiceProvider
 
         // Register console commands
         $this->registerCommands();
+
+        // Schedule commands
+        $this->scheduleCommands();
 
         // Hook into the mailer
         Event::listen(MessageSending::class, function(MessageSending $event) {
@@ -56,12 +61,6 @@ class MailTrackerServiceProvider extends ServiceProvider
         $this->app->scoped(MailTrackerManager::class, function($app){
             return new MailTrackerManager($app);
         });
-//        $this->app->scoped(MailTracker::class, function($app) {
-//            return new MailTracker(
-//                $this->app->make(MailTrackerManager::class),
-//                $this->app->make(MailerResolver::class),
-//            );
-//        });
     }
 
     /**
@@ -130,5 +129,17 @@ class MailTrackerServiceProvider extends ServiceProvider
                 Route::get('smtp-detail/{id}', [AdminController::class, 'getSmtpDetail'])->name('mailTracker_SmtpDetail');
             });
         }
+    }
+
+    protected function scheduleCommands()
+    {
+        $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
+            if(MailTracker::$schedulePurging){
+                $schedule->job(
+                    new PurgeSentEmailsJob(),
+                    config('mail-tracker.tracker-queue')
+                )->dailyAt(MailTracker::$scheduleTime);
+            }
+        });
     }
 }

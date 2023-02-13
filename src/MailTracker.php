@@ -41,6 +41,15 @@ class MailTracker
      */
     public static string $sentEmailUrlClickedModel = SentEmailUrlClicked::class;
 
+    /**
+     * @var bool
+     */
+    public static bool $schedulePurging = false;
+
+    /**
+     * @var string
+     */
+    public static string $scheduleTime = '03:00';
 
     /**
      * This is used for resolving the mailer during a message send.
@@ -112,6 +121,12 @@ class MailTracker
         return new static::$sentEmailUrlClickedModel($attributes);
     }
 
+    public static function shouldSchedulePurging(string $time = '03:00'): void
+    {
+        static::$schedulePurging = true;
+        static::$scheduleTime = $time;
+    }
+
     public function __construct(protected MailTrackerManager $manager, protected MailerResolver $resolver)
     {
     }
@@ -131,9 +146,6 @@ class MailTracker
         // Create the trackers
         $mailer = $this->resolver->resolve($event->data);
         $this->createTrackers($message, $mailer);
-
-        // Purge old records
-        $this->purgeOldRecords();
     }
 
     public function messageSent(MessageSent $event): void
@@ -347,30 +359,6 @@ class MailTracker
 
                 Event::dispatch(new EmailSentEvent($tracker));
             }
-        }
-    }
-
-    /**
-     * Purge old records in the database
-     *
-     * @return void
-     */
-    protected function purgeOldRecords()
-    {
-        if (config('mail-tracker.expire-days') > 0) {
-            $emails = MailTracker::sentEmailModel()->newQuery()->where('created_at', '<', \Carbon\Carbon::now()
-                ->subDays(config('mail-tracker.expire-days')))
-                ->select('id', 'meta')
-                ->get();
-            // remove files
-            $emails->each(function ($email) {
-                if ($email->meta && ($filePath = $email->meta->get('content_file_path'))) {
-                    Storage::disk(config('mail-tracker.tracker-filesystem'))->delete($filePath);
-                }
-            });
-
-            MailTracker::sentEmailUrlClickedModel()->newQuery()->whereIn('sent_email_id', $emails->pluck('id'))->delete();
-            MailTracker::sentEmailModel()->newQuery()->whereIn('id', $emails->pluck('id'))->delete();
         }
     }
 }
