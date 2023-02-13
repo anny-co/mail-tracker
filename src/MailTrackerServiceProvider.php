@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use jdavidbakr\MailTracker\Console\Commands\MigrateRecipientsCommand;
 use jdavidbakr\MailTracker\Console\Commands\PurgeSentEmailsCommand;
 use jdavidbakr\MailTracker\Contracts\MailerResolver;
 use jdavidbakr\MailTracker\Http\Controllers\AdminController;
@@ -26,7 +27,7 @@ class MailTrackerServiceProvider extends ServiceProvider
     public function boot()
     {
         if (MailTracker::$runsMigrations && $this->app->runningInConsole()) {
-            $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+            $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
         }
 
         // Publish pieces
@@ -40,10 +41,10 @@ class MailTrackerServiceProvider extends ServiceProvider
         $this->scheduleCommands();
 
         // Hook into the mailer
-        Event::listen(MessageSending::class, function(MessageSending $event) {
+        Event::listen(MessageSending::class, function (MessageSending $event) {
             $this->app->make(MailTracker::class)->messageSending($event);
         });
-        Event::listen(MessageSent::class, function(MessageSent $mail) {
+        Event::listen(MessageSent::class, function (MessageSent $mail) {
             $this->app->make(MailTracker::class)->messageSent($mail);
         });
 
@@ -59,7 +60,7 @@ class MailTrackerServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->scoped(MailerResolver::class, MailTrackerMailerResolver::class);
-        $this->app->scoped(MailTrackerManager::class, function($app){
+        $this->app->scoped(MailTrackerManager::class, function ($app) {
             return new MailTrackerManager($app);
         });
     }
@@ -72,7 +73,7 @@ class MailTrackerServiceProvider extends ServiceProvider
     protected function publishConfig()
     {
         $this->publishes([
-            __DIR__.'/../config/mail-tracker.php' => config_path('mail-tracker.php')
+            __DIR__ . '/../config/mail-tracker.php' => config_path('mail-tracker.php')
         ], 'config');
     }
 
@@ -83,10 +84,10 @@ class MailTrackerServiceProvider extends ServiceProvider
      */
     protected function publishViews()
     {
-        $this->loadViewsFrom(__DIR__.'/views', 'emailTrakingViews');
+        $this->loadViewsFrom(__DIR__ . '/views', 'emailTrakingViews');
         $this->publishes([
-            __DIR__.'/views' => base_path('resources/views/vendor/emailTrakingViews'),
-            ]);
+            __DIR__ . '/views' => base_path('resources/views/vendor/emailTrakingViews'),
+        ]);
     }
 
     public function registerCommands()
@@ -94,7 +95,7 @@ class MailTrackerServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 PurgeSentEmailsCommand::class,
-                Console\MigrateRecipients::class,
+                MigrateRecipientsCommand::class,
             ]);
         }
     }
@@ -136,7 +137,7 @@ class MailTrackerServiceProvider extends ServiceProvider
     protected function scheduleCommands()
     {
         $this->callAfterResolving(Schedule::class, function (Schedule $schedule) {
-            if(MailTracker::$schedulePurging){
+            if (MailTracker::$schedulePurging) {
                 $schedule->job(
                     new PurgeSentEmailsJob(),
                     config('mail-tracker.tracker-queue')

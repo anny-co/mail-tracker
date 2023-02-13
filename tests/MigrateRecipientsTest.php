@@ -4,7 +4,7 @@ namespace jdavidbakr\MailTracker\Tests;
 
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-use jdavidbakr\MailTracker\Console\MigrateRecipients;
+use jdavidbakr\MailTracker\Console\Commands\MigrateRecipientsCommand;
 use jdavidbakr\MailTracker\MailTracker;
 
 class MigrateRecipientsTest extends SetUpTest
@@ -24,7 +24,7 @@ class MigrateRecipientsTest extends SetUpTest
             'sender' => 'Sender Dude <sender@example.com>',
             'recipient' => 'Recipient Dude <recipient@example.com>',
         ]);
-        $command = new MigrateRecipients;
+        $command = new MigrateRecipientsCommand;
 
         $command->handle();
 
@@ -52,7 +52,7 @@ class MigrateRecipientsTest extends SetUpTest
             'sender' => ' <sender@example.com>',
             'recipient' => ' <recipient@example.com>',
         ]);
-        $command = new MigrateRecipients;
+        $command = new MigrateRecipientsCommand;
 
         $command->handle();
 

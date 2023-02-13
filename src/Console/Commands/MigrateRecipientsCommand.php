@@ -1,12 +1,12 @@
 <?php
 
-namespace jdavidbakr\MailTracker\Console;
+namespace jdavidbakr\MailTracker\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use jdavidbakr\MailTracker\MailTracker;
 
-class MigrateRecipients extends Command
+class MigrateRecipientsCommand extends Command
 {
     /**
      * The name and signature of the console command.
