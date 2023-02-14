@@ -12,10 +12,13 @@ use Illuminate\Support\ServiceProvider;
 use jdavidbakr\MailTracker\Console\Commands\MigrateRecipientsCommand;
 use jdavidbakr\MailTracker\Console\Commands\PurgeSentEmailsCommand;
 use jdavidbakr\MailTracker\Contracts\MailerResolver;
+use jdavidbakr\MailTracker\Contracts\TrackerCreator;
 use jdavidbakr\MailTracker\Http\Controllers\AdminController;
 use jdavidbakr\MailTracker\Http\Controllers\CallbackController;
 use jdavidbakr\MailTracker\Http\Controllers\MailTrackerController;
 use jdavidbakr\MailTracker\Jobs\PurgeSentEmailsJob;
+use jdavidbakr\MailTracker\Listeners\MessageSendingListener;
+use jdavidbakr\MailTracker\Listeners\MessageSentListener;
 
 class MailTrackerServiceProvider extends ServiceProvider
 {
@@ -34,6 +37,13 @@ class MailTrackerServiceProvider extends ServiceProvider
         $this->publishConfig();
         $this->publishViews();
 
+        $this->mergeConfigFrom(
+            __DIR__.'/../config/mail-tracker.php', 'mail-tracker'
+        );
+
+        // trackers
+        MailTracker::registerTrackers($this->app);
+
         // Register console commands
         $this->registerCommands();
 
@@ -41,12 +51,8 @@ class MailTrackerServiceProvider extends ServiceProvider
         $this->scheduleCommands();
 
         // Hook into the mailer
-        Event::listen(MessageSending::class, function (MessageSending $event) {
-            $this->app->make(MailTracker::class)->messageSending($event);
-        });
-        Event::listen(MessageSent::class, function (MessageSent $mail) {
-            $this->app->make(MailTracker::class)->messageSent($mail);
-        });
+        Event::listen(MessageSending::class, MessageSendingListener::class);
+        Event::listen(MessageSent::class, MessageSentListener::class);
 
         // Install the routes
         $this->installRoutes();
@@ -63,6 +69,7 @@ class MailTrackerServiceProvider extends ServiceProvider
         $this->app->scoped(MailTrackerManager::class, function ($app) {
             return new MailTrackerManager($app);
         });
+        $this->app->scoped(TrackerCreator::class, MailTrackerCreator::class);
     }
 
     /**

@@ -10,9 +10,7 @@ use jdavidbakr\MailTracker\MailTracker;
 
 class RecordDeliveryJobTest extends SetUpTest
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function it_marks_the_email_as_unsuccessful()
     {
         Event::fake();
@@ -50,9 +48,7 @@ class RecordDeliveryJobTest extends SetUpTest
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function it_handles_this_situation()
     {
         $message = (object)[

@@ -10,9 +10,7 @@ use jdavidbakr\MailTracker\MailTracker;
 
 class RecordLinkClickJobTest extends SetUpTest
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function it_records_clicks_to_links()
     {
         Event::fake();

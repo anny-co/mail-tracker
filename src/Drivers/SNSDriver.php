@@ -23,7 +23,9 @@ class SNSDriver implements MailTrackerDriver
             // for SNSMessage we have to pass the json data in $request->message
             $message = new SNSMessage(json_decode($request->message, true));
         } else {
-            $message = SNSMessage::fromRawPostData();
+            $message = SNSMessage::fromJsonString(
+                $request->getContent()
+            );
             $validator = app(SNSMessageValidator::class);
             $validator->validate($message);
         }

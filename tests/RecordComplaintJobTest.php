@@ -10,9 +10,7 @@ use jdavidbakr\MailTracker\MailTracker;
 
 class RecordComplaintJobTest extends SetUpTest
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function it_marks_the_email_as_unsuccessful()
     {
         Event::fake();

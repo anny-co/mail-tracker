@@ -2,6 +2,8 @@
 
 namespace jdavidbakr\MailTracker\Tests;
 
+use Illuminate\Foundation\Application;
+use jdavidbakr\MailTracker\MailTrackerServiceProvider;
 use Orchestra\Testbench\TestCase;
 
 abstract class SetUpTest extends TestCase
@@ -14,29 +16,29 @@ abstract class SetUpTest extends TestCase
         parent::setUp();
 
         $this->artisan('migrate', ['--database' => 'testbench']);
-
-        return;
     }
 
     /**
-     * Get package providers.  At a minimum this is the package being tested, but also
+     * Get package providers. At a minimum this is the package being tested, but also
      * would include packages upon which our package depends, e.g. Cartalyst/Sentry
      * In a normal app environment these would be added to the 'providers' array in
      * the config/app.php file.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  Application  $app
      *
      * @return array
      */
     protected function getPackageProviders($app)
     {
-        return ['jdavidbakr\MailTracker\MailTrackerServiceProvider'];
+        return [
+            MailTrackerServiceProvider::class
+        ];
     }
 
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  Application  $app
      *
      * @return void
      */

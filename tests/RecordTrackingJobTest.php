@@ -10,9 +10,7 @@ use jdavidbakr\MailTracker\MailTracker;
 
 class RecordTrackingJobTest extends SetUpTest
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function it_records_views()
     {
         Event::fake();

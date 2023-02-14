@@ -1,16 +1,17 @@
 <?php
 
+use jdavidbakr\MailTracker\Trackers\LinkTracker;
+use jdavidbakr\MailTracker\Trackers\PixelTracker;
+
 return [
 
     /**
-     * To disable the pixel injection, set this to false.
+     * Trackers to be used.
      */
-    'inject-pixel' => true,
-
-    /**
-     * To disable injecting tracking links, set this to false.
-     */
-    'track-links' => true,
+    'trackers' => [
+        LinkTracker::class,
+        PixelTracker::class,
+    ],
 
     /**
      * Optionally expire old emails, set to 0 to keep forever.
@@ -92,7 +93,7 @@ return [
     'tracker-filesystem-folder' => 'mail-tracker',
 
     /**
-     *  Determines whether or not the used mail driver should be logged
+     *  Determines whether the used mail driver should be logged
      */
     'log-mail-driver' => false,
 

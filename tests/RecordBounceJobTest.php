@@ -11,9 +11,7 @@ use jdavidbakr\MailTracker\MailTracker;
 
 class RecordBounceJobTest extends SetUpTest
 {
-    /**
-     * @test
-     */
+    /** @test */
     public function it_handles_permanent_bounce()
     {
         Event::fake();
@@ -55,9 +53,7 @@ class RecordBounceJobTest extends SetUpTest
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function it_handles_transient_bounce()
     {
         Event::fake();
@@ -104,9 +100,7 @@ class RecordBounceJobTest extends SetUpTest
         });
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function it_handles_transient_bounce_without_diagnostic_code()
     {
         Event::fake();
