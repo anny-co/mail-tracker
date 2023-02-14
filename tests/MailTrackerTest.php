@@ -1301,8 +1301,6 @@ class MailTrackerTest extends SetUpTest
         $str->shouldReceive('random')
             ->andReturn('random-hash');
 
-        config()->set('mail-tracker.log-mail-driver', true);
-
         \View::addLocation(__DIR__);
         try {
             \Mail::send('email.test', [], function ($message) use ($email, $subject, $name) {
