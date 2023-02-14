@@ -13,10 +13,9 @@ use jdavidbakr\MailTracker\Drivers\Ses\Jobs\SesRecordBounceJob;
 use jdavidbakr\MailTracker\Drivers\Ses\Jobs\SesRecordComplaintJob;
 use jdavidbakr\MailTracker\Drivers\Ses\Jobs\SesRecordDeliveryJob;
 
-
 class SesDriver implements MailTrackerDriver
 {
-    public function callback(Request $request) : Response
+    public function callback(Request $request): Response
     {
         if (config('app.env') != 'production' && $request->message) {
             // phpunit cannot mock static methods so without making a facade
@@ -56,13 +55,14 @@ class SesDriver implements MailTrackerDriver
         return null;
     }
 
-    protected function confirm_subscription($message) : Response
+    protected function confirm_subscription($message): Response
     {
         Http::get($message->offsetGet('SubscribeURL'));
+
         return response('subscription confirmed');
     }
 
-    protected function process_notification($message) : Response
+    protected function process_notification($message): Response
     {
         $message = json_decode($message->offsetGet('Message'));
         switch ($message->notificationType) {
@@ -76,6 +76,7 @@ class SesDriver implements MailTrackerDriver
                 $this->process_complaint($message);
                 break;
         }
+
         return response('notification processed');
     }
 

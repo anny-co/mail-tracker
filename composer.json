@@ -27,7 +27,8 @@
         "phpunit/phpunit": "^9.5.10",
         "orchestra/testbench": "^7.0|^8.0",
         "mockery/mockery": "^1.4.4",
-        "nunomaduro/collision": "v6.x-dev"
+        "nunomaduro/collision": "v6.x-dev",
+        "laravel/pint": "dev-main"
     },
     "suggest": {
         "fedeisas/laravel-mail-css-inliner": "Automatically inlines CSS into all outgoing mail."

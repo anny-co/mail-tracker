@@ -8,12 +8,10 @@ use jdavidbakr\MailTracker\Contracts\TrackerCreator;
 
 class MessageSendingListener
 {
-
     public function __construct(
         protected MailerResolver $resolver,
         protected TrackerCreator $trackerCreator,
-    )
-    {
+    ) {
     }
 
     public function handle(MessageSending $event)
@@ -23,5 +21,4 @@ class MessageSendingListener
             $this->resolver->resolve($event->data)
         );
     }
-
 }

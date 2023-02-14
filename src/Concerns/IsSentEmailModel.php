@@ -26,6 +26,7 @@ trait IsSentEmailModel
     public function getConnectionName()
     {
         $connName = config('mail-tracker.connection');
+
         return $connName ?: config('database.default');
     }
 
@@ -48,12 +49,12 @@ trait IsSentEmailModel
             set: function ($value) {
                 $meta = collect($this->meta);
 
-                $meta->put('mail_driver',$value);
+                $meta->put('mail_driver', $value);
 
 //                $this->meta = $meta;
 
                 return [
-                    'meta' => $meta
+                    'meta' => $meta,
                 ];
             }
         );
@@ -68,14 +69,15 @@ trait IsSentEmailModel
     {
         return collect(preg_split("/(\r\n)(?!\s)/", $this->headers))
             ->filter(function ($header) {
-                return preg_match("/:/", $header);
+                return preg_match('/:/', $header);
             })
             ->transform(function ($header) {
                 $header = Str::replace("\r\n", '', $header);
-                list($key, $value) = explode(":", $header, 2);
+                [$key, $value] = explode(':', $header, 2);
+
                 return collect([
                     'key' => trim($key),
-                    'value' => trim($value)
+                    'value' => trim($value),
                 ]);
             })->filter(function ($header) {
                 return $header->get('key');
@@ -109,13 +111,13 @@ trait IsSentEmailModel
     {
         $logContent = config('mail-tracker.log-content', true);
 
-        if(!$logContent) {
+        if (! $logContent) {
             return $this;
         }
 
         $logContentStrategy = config('mail-tracker.log-content-strategy', 'database');
 
-        if(!in_array($logContentStrategy, ['database', 'filesystem'])) {
+        if (! in_array($logContentStrategy, ['database', 'filesystem'])) {
             return $this;
         }
 
@@ -143,7 +145,7 @@ trait IsSentEmailModel
         // handling database strategy
         if ($logContentStrategy === 'database') {
             $databaseContent = Str::length($originalHtml) > config('mail-tracker.content-max-size', 65535)
-                ? Str::substr($originalHtml, 0, config('mail-tracker.content-max-size', 65535)) . '...'
+                ? Str::substr($originalHtml, 0, config('mail-tracker.content-max-size', 65535)).'...'
                 : $originalHtml;
         }
 
@@ -154,11 +156,12 @@ trait IsSentEmailModel
 
     /**
      * Returns a bootstrap class about the success/failure of the message
+     *
      * @return [type] [description]
      */
     public function getReportClassAttribute()
     {
-        if (!empty($this->meta) && $this->meta->has('success')) {
+        if (! empty($this->meta) && $this->meta->has('success')) {
             if ($this->meta->get('success')) {
                 return 'success';
             } else {
@@ -181,6 +184,7 @@ trait IsSentEmailModel
 
     /**
      * Returns the smtp detail for this message ()
+     *
      * @return [type] [description]
      */
     public function getSmtpInfoAttribute()
@@ -195,18 +199,18 @@ trait IsSentEmailModel
             $delivered_at = $meta->get('delivered_at');
             $responses[] = $response.' - Delivered '.$delivered_at;
         }
-        if($meta->has('failures') && !empty($meta->get('mailgun_message_bounce')['delivery-status'])){
+        if ($meta->has('failures') && ! empty($meta->get('mailgun_message_bounce')['delivery-status'])) {
             $deliveryStatus = $meta->get('mailgun_message_bounce')['delivery-status'];
             foreach ($meta->get('failures') as $failure) {
-                if (!empty($deliveryStatus['code'])) {
-                    $responses [] = $deliveryStatus['code'] . ' (' . $deliveryStatus['message'] . '): ' . $deliveryStatus['description'] . ' (' . $failure['emailAddress'] . ')';
+                if (! empty($deliveryStatus['code'])) {
+                    $responses[] = $deliveryStatus['code'].' ('.$deliveryStatus['message'].'): '.$deliveryStatus['description'].' ('.$failure['emailAddress'].')';
                 } else {
-                    $responses[] = 'Generic Failure (' . $failure['emailAddress'] . ')';
+                    $responses[] = 'Generic Failure ('.$failure['emailAddress'].')';
                 }
             }
         } elseif ($meta->has('failures')) {
             foreach ($meta->get('failures') as $failure) {
-                if (!empty($failure['status'])) {
+                if (! empty($failure['status'])) {
                     $responses[] = $failure['status'].' ('.$failure['action'].'): '.$failure['diagnosticCode'].' ('.$failure['emailAddress'].')';
                 } else {
                     $responses[] = 'Generic Failure ('.$failure['emailAddress'].')';
@@ -217,15 +221,15 @@ trait IsSentEmailModel
             if ($meta->get('complaint_type')) {
                 $responses[] = 'Complaint: '.$meta->get('complaint_type').' at '.$complaint_time;
             } else {
-                $responses[] = 'Complaint at '.$complaint_time->format("n/d/y g:i a");
+                $responses[] = 'Complaint at '.$complaint_time->format('n/d/y g:i a');
             }
         }
-        return implode(" | ", $responses);
+
+        return implode(' | ', $responses);
     }
 
     /**
      * Get content according to log-content-strategy.
-     * @return string|null
      */
     public function getContentAttribute(): ?string
     {
@@ -239,6 +243,7 @@ trait IsSentEmailModel
                 return null;
             }
         }
+
         return null;
     }
 }

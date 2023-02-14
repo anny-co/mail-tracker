@@ -12,13 +12,11 @@ class ViewEmailEvent implements ShouldQueue
     use SerializesModels;
 
     public $sent_email;
+
     public $ip_address;
 
     /**
      * Create a new event instance.
-     *
-     * @param Model|SentEmailModel $sent_email
-     * @param $ip_address
      */
     public function __construct(Model|SentEmailModel $sent_email, $ip_address)
     {

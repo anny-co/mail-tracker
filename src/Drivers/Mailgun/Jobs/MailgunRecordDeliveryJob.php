@@ -2,15 +2,14 @@
 
 namespace jdavidbakr\MailTracker\Drivers\Mailgun\Jobs;
 
-
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Event;
 use jdavidbakr\MailTracker\Events\EmailDeliveredEvent;
 
 class MailgunRecordDeliveryJob implements ShouldQueue
@@ -22,6 +21,7 @@ class MailgunRecordDeliveryJob implements ShouldQueue
 
     /**
      * See message structure
+     *
      * @docs https://documentation.mailgun.com/en/latest/api-events.html#event-structure
      */
     public array $eventData;
@@ -42,12 +42,11 @@ class MailgunRecordDeliveryJob implements ShouldQueue
         $messageId = Arr::get($this->eventData, 'message.headers.message-id');
         $sent_email = $model::where('message_id', $messageId)->first();
         if ($sent_email) {
-
             $code = Arr::get($this->eventData, 'delivery-status.code');
             $success = 200 <= $code && $code < 300;
-            $smtpResponse = $code . ' - '
-                . Arr::get($this->eventData, 'delivery-status.message') . ' '
-                . Arr::get($this->eventData, 'delivery-status.description');
+            $smtpResponse = $code.' - '
+                .Arr::get($this->eventData, 'delivery-status.message').' '
+                .Arr::get($this->eventData, 'delivery-status.description');
 
             $meta = collect($sent_email->meta);
             $meta->put('smtpResponse', $smtpResponse);

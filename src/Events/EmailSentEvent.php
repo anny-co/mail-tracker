@@ -16,7 +16,6 @@ class EmailSentEvent implements ShouldQueue
     /**
      * Create a new event instance.
      *
-     * @param  Model|SentEmailModel  $sent_email
      * @return void
      */
     public function __construct(Model|SentEmailModel $sent_email)

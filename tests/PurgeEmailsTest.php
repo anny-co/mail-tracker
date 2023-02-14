@@ -15,10 +15,6 @@ use jdavidbakr\MailTracker\MailTracker;
 
 class PurgeEmailsTest extends SetUpTest
 {
-
-    /**
-     * @return array
-     */
     protected function createEmailAndClick(): array
     {
         $oldSentEmail = MailTracker::sentEmailModel()->newQuery()->create([
@@ -48,7 +44,7 @@ class PurgeEmailsTest extends SetUpTest
     public function it_purges_old_emails()
     {
         config()->set('mail-tracker.expire-days', 1);
-        list($oldSentEmail, $oldUrlClicked) = $this->createEmailAndClick();
+        [$oldSentEmail, $oldUrlClicked] = $this->createEmailAndClick();
 
         $this->travelTo(now()->addDay()->addMinute());
 
@@ -63,7 +59,7 @@ class PurgeEmailsTest extends SetUpTest
     public function job_purges_old_emails()
     {
         config()->set('mail-tracker.expire-days', 1);
-        list($oldSentEmail, $oldUrlClicked) = $this->createEmailAndClick();
+        [$oldSentEmail, $oldUrlClicked] = $this->createEmailAndClick();
 
         $this->travelTo(now()->addDay()->addMinute());
 
@@ -78,7 +74,7 @@ class PurgeEmailsTest extends SetUpTest
     public function command_purges_old_emails()
     {
         config()->set('mail-tracker.expire-days', 1);
-        list($oldSentEmail, $oldUrlClicked) = $this->createEmailAndClick();
+        [$oldSentEmail, $oldUrlClicked] = $this->createEmailAndClick();
 
         $this->travelTo(now()->addDay()->addMinute());
 
@@ -92,7 +88,7 @@ class PurgeEmailsTest extends SetUpTest
     public function command_overrides_expire_days()
     {
         config()->set('mail-tracker.expire-days', 10);
-        list($oldSentEmail, $oldUrlClicked) = $this->createEmailAndClick();
+        [$oldSentEmail, $oldUrlClicked] = $this->createEmailAndClick();
 
         $this->travelTo(now()->addDays(2)->addMinute());
 
@@ -106,7 +102,7 @@ class PurgeEmailsTest extends SetUpTest
     public function it_dont_purges_emails()
     {
         config()->set('mail-tracker.expire-days', 1);
-        list($oldSentEmail, $oldUrlClicked) = $this->createEmailAndClick();
+        [$oldSentEmail, $oldUrlClicked] = $this->createEmailAndClick();
 
         $this->travelTo(now()->addDay()->subMinute());
 
@@ -121,7 +117,7 @@ class PurgeEmailsTest extends SetUpTest
     public function it_dont_purges_with_config_0()
     {
         config()->set('mail-tracker.expire-days', 0);
-        list($oldSentEmail, $oldUrlClicked) = $this->createEmailAndClick();
+        [$oldSentEmail, $oldUrlClicked] = $this->createEmailAndClick();
 
         $this->travelTo(now()->addDay()->addMinute());
 
@@ -140,7 +136,7 @@ class PurgeEmailsTest extends SetUpTest
         $this->app['migrator']->setConnection('secondary');
         $this->artisan('migrate', ['--database' => 'secondary']);
 
-        list($oldSentEmail, $oldUrlClicked) = $this->createEmailAndClick();
+        [$oldSentEmail, $oldUrlClicked] = $this->createEmailAndClick();
 
         $this->travelTo(now()->addDay()->addMinute());
 
@@ -161,12 +157,12 @@ class PurgeEmailsTest extends SetUpTest
             'mail-tracker.tracker-filesystem-folder' => 'mail-tracker',
             'filesystems.disks.testing.driver' => 'local',
             'filesystems.default' => 'testing',
-            'mail-tracker.expire-days' => 1
+            'mail-tracker.expire-days' => 1,
         ]);
 
         Storage::fake($disk);
 
-        list($oldSentEmail, $oldUrlClicked) = $this->createEmailAndClick();#
+        [$oldSentEmail, $oldUrlClicked] = $this->createEmailAndClick(); //
 
         // create file
         $filePath = 'mail-tracker/random-hash.html';
@@ -183,11 +179,6 @@ class PurgeEmailsTest extends SetUpTest
         Storage::assertMissing($filePath);
     }
 
-    /**
-     * @param string $commandName
-     * @param Carbon|null $atTime
-     * @return Collection
-     */
     private function getScheduledEventsForCommand(string $commandName, Carbon $atTime = null): Collection
     {
         /**
@@ -196,12 +187,11 @@ class PurgeEmailsTest extends SetUpTest
         $schedule = $this->app->make(Schedule::class);
 
         return collect($schedule->events())->filter(function (Event $event) use ($commandName, $atTime) {
-
-            if (!str_contains($event->command, $commandName) && strcmp($event->description, $commandName) !== 0) {
+            if (! str_contains($event->command, $commandName) && strcmp($event->description, $commandName) !== 0) {
                 return false;
             }
 
-            # optionally filter out events that are not due at the given time.
+            // optionally filter out events that are not due at the given time.
             if ($atTime !== null) {
                 $this->travelTo($atTime);
                 Carbon::setTestNow($atTime);
@@ -214,5 +204,4 @@ class PurgeEmailsTest extends SetUpTest
             }
         });
     }
-
 }

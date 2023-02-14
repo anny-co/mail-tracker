@@ -6,11 +6,10 @@ use jdavidbakr\MailTracker\Contracts\Tracker;
 
 class LinkTracker implements Tracker
 {
-
     public function convert(string $html, string $hash): string
     {
         return preg_replace_callback(
-            "/(<a[^>]*href=[\"])([^\"]*)/",
+            '/(<a[^>]*href=["])([^"]*)/',
             function ($matches) use ($hash) {
                 return $this->injectLinkCallback($matches, $hash);
             },
@@ -26,12 +25,12 @@ class LinkTracker implements Tracker
             $url = str_replace('&amp;', '&', $matches[2]);
         }
 
-        return $matches[1] . route(
-                'mailTracker_n',
-                [
-                    'l' => $url,
-                    'h' => $hash
-                ]
-            );
+        return $matches[1].route(
+            'mailTracker_n',
+            [
+                'l' => $url,
+                'h' => $hash,
+            ]
+        );
     }
 }

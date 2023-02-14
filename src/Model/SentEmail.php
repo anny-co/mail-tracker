@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use jdavidbakr\MailTracker\Concerns\IsSentEmailModel;
 use jdavidbakr\MailTracker\Contracts\SentEmailModel;
-use Symfony\Component\Mime\Header\Headers;
 
 /**
  * @property string $hash

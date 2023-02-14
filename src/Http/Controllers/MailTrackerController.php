@@ -28,7 +28,7 @@ class MailTrackerController extends Controller
         if ($tracker) {
             RecordTrackingJob::dispatch($tracker, request()->ip())
                 ->onQueue(config('mail-tracker.tracker-queue'));
-            if (!$tracker->opened_at) {
+            if (! $tracker->opened_at) {
                 $tracker->opened_at = now();
                 $tracker->save();
             }
@@ -39,10 +39,11 @@ class MailTrackerController extends Controller
 
     public function getL($url, $hash)
     {
-        $url = base64_decode(str_replace("$", "/", $url));
+        $url = base64_decode(str_replace('$', '/', $url));
         if (filter_var($url, FILTER_VALIDATE_URL) === false) {
             throw new BadUrlLink('Mail hash: '.$hash.', URL: '.$url);
         }
+
         return $this->linkClicked($url, $hash);
     }
 
@@ -50,12 +51,13 @@ class MailTrackerController extends Controller
     {
         $url = $request->l;
         $hash = $request->h;
+
         return $this->linkClicked($url, $hash);
     }
 
     protected function linkClicked($url, $hash)
     {
-        if (!$url) {
+        if (! $url) {
             $url = config('mail-tracker.redirect-missing-links-to') ?: '/';
         }
         $tracker = MailTracker::sentEmailModel()->newQuery()->where('hash', $hash)
@@ -65,16 +67,17 @@ class MailTrackerController extends Controller
                 ->onQueue(config('mail-tracker.tracker-queue'));
 
             // If no opened at but has a clicked event then we can assume that it was in fact opened, the tracking pixel may have been blocked
-            if (config('mail-tracker.inject-pixel') && !$tracker->opened_at) {
+            if (config('mail-tracker.inject-pixel') && ! $tracker->opened_at) {
                 $tracker->opened_at = now();
                 $tracker->save();
             }
 
-            if (!$tracker->clicked_at) {
+            if (! $tracker->clicked_at) {
                 $tracker->clicked_at = now();
                 $tracker->save();
             }
         }
+
         return redirect($url);
     }
 }

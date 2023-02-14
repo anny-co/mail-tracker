@@ -25,13 +25,12 @@ abstract class SetUpTest extends TestCase
      * the config/app.php file.
      *
      * @param  Application  $app
-     *
      * @return array
      */
     protected function getPackageProviders($app)
     {
         return [
-            MailTrackerServiceProvider::class
+            MailTrackerServiceProvider::class,
         ];
     }
 
@@ -39,7 +38,6 @@ abstract class SetUpTest extends TestCase
      * Define environment setup.
      *
      * @param  Application  $app
-     *
      * @return void
      */
     protected function getEnvironmentSetUp($app)
@@ -54,7 +52,7 @@ abstract class SetUpTest extends TestCase
         $app['config']->set('database.connections.secondary', [
             'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix' => ''
+            'prefix' => '',
         ]);
         $app['config']->set('aws.credentials', [
             'key' => 'aws-key',

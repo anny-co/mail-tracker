@@ -38,7 +38,7 @@ class SesRecordComplaintJob implements ShouldQueue
             $meta->put('complaint', true);
             $meta->put('success', false);
             $meta->put('complaint_time', $this->message->complaint->timestamp);
-            if (!empty($this->message->complaint->complaintFeedbackType)) {
+            if (! empty($this->message->complaint->complaintFeedbackType)) {
                 $meta->put('complaint_type', $this->message->complaint->complaintFeedbackType);
             }
             $meta->put('sns_message_complaint', $this->message); // append the full message received from SNS to the 'meta' field

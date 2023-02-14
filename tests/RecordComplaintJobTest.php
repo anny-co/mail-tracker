@@ -15,23 +15,23 @@ class RecordComplaintJobTest extends SetUpTest
     {
         Event::fake();
         $track = MailTracker::sentEmailModel()->newQuery()->create([
-                'hash' => Str::random(32),
-            ]);
+            'hash' => Str::random(32),
+        ]);
         $message_id = Str::uuid();
         $track->message_id = $message_id;
         $track->save();
-        $message = (object)[
-            'mail' => (object)[
+        $message = (object) [
+            'mail' => (object) [
                 'messageId' => $message_id,
             ],
-            'complaint' => (object)[
+            'complaint' => (object) [
                 'timestamp' => 12345,
-                'complainedRecipients' => (object)[
-                    (object)[
-                       'emailAddress' => 'recipient@example.com'
-                    ]
+                'complainedRecipients' => (object) [
+                    (object) [
+                        'emailAddress' => 'recipient@example.com',
+                    ],
                 ],
-            ]
+            ],
         ];
         $job = new SesRecordComplaintJob($message);
 

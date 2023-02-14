@@ -7,8 +7,8 @@ use jdavidbakr\MailTracker\MailTracker;
 
 class MailerResolverTest extends SetUpTest
 {
-
-    protected function resolver(): MailerResolver {
+    protected function resolver(): MailerResolver
+    {
         return $this->app->make(MailerResolver::class);
     }
 

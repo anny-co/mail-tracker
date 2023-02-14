@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace jdavidbakr\MailTracker;
@@ -11,12 +12,10 @@ use jdavidbakr\MailTracker\Drivers\Ses\SesDriver;
 
 class MailTrackerManager extends Manager
 {
-
     public function getDefaultDriver(): string
     {
         return 'ses';
     }
-
 
     public function createSmtpDriver(): MailTrackerDriver
     {
@@ -35,6 +34,7 @@ class MailTrackerManager extends Manager
 
     /**
      * TODO: Need to test how to work with failover driver
+     *
      * @return LocalDriver
      */
     public function createFailoverDriver(): MailTrackerDriver

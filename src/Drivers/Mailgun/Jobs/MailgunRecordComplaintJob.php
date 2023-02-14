@@ -2,14 +2,13 @@
 
 namespace jdavidbakr\MailTracker\Drivers\Mailgun\Jobs;
 
-
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Event;
 use jdavidbakr\MailTracker\Events\ComplaintMessageEvent;
 
 class MailgunRecordComplaintJob implements ShouldQueue
@@ -21,6 +20,7 @@ class MailgunRecordComplaintJob implements ShouldQueue
 
     /**
      * See message structure
+     *
      * @docs https://documentation.mailgun.com/en/latest/api-events.html#event-structure
      */
     public array $eventData;
@@ -45,7 +45,7 @@ class MailgunRecordComplaintJob implements ShouldQueue
             $meta = collect($sent_email->meta);
             $meta->put('complaint', true);
             $meta->put('success', false);
-            $meta->put('complaint_time',  Arr::get($this->eventData, 'timestamp'));
+            $meta->put('complaint_time', Arr::get($this->eventData, 'timestamp'));
             $meta->put('mailgun_message_complaint', $this->eventData); // append the full message received from Mailgun to the 'meta' field
             $sent_email->meta = $meta;
             $sent_email->save();

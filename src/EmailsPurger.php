@@ -8,14 +8,13 @@ use Illuminate\Support\Facades\Storage;
 
 class EmailsPurger
 {
-
     public function purge(int|null $expireDays = null): void
     {
-        if(!$expireDays) {
+        if (! $expireDays) {
             $expireDays = config('mail-tracker.expire-days');
         }
 
-        if(!$expireDays){
+        if (! $expireDays) {
             return;
         }
 
@@ -32,9 +31,9 @@ class EmailsPurger
                 });
 
                 // delete files
-                try{
+                try {
                     Storage::disk(config('mail-tracker.tracker-filesystem'))->delete($paths);
-                } catch (\Exception $exception){
+                } catch (\Exception $exception) {
                     // fail silently
                 }
 

@@ -11,7 +11,7 @@ class PurgeSentEmailsJob implements ShouldQueue, ShouldBeUnique
     public function handle(EmailsPurger $purger)
     {
         $expireDays = config('mail-tracker.expire-days');
-        if (!$expireDays) {
+        if (! $expireDays) {
             return;
         }
 

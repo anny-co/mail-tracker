@@ -30,7 +30,7 @@ class MailTrackerServiceProvider extends ServiceProvider
     public function boot()
     {
         if (MailTracker::$runsMigrations && $this->app->runningInConsole()) {
-            $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+            $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         }
 
         // Publish pieces
@@ -80,7 +80,7 @@ class MailTrackerServiceProvider extends ServiceProvider
     protected function publishConfig()
     {
         $this->publishes([
-            __DIR__ . '/../config/mail-tracker.php' => config_path('mail-tracker.php')
+            __DIR__.'/../config/mail-tracker.php' => config_path('mail-tracker.php'),
         ], 'config');
     }
 
@@ -91,9 +91,9 @@ class MailTrackerServiceProvider extends ServiceProvider
      */
     protected function publishViews()
     {
-        $this->loadViewsFrom(__DIR__ . '/views', 'emailTrakingViews');
+        $this->loadViewsFrom(__DIR__.'/views', 'emailTrakingViews');
         $this->publishes([
-            __DIR__ . '/views' => base_path('resources/views/vendor/emailTrakingViews'),
+            __DIR__.'/views' => base_path('resources/views/vendor/emailTrakingViews'),
         ]);
     }
 

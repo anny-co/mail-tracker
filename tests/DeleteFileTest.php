@@ -7,7 +7,6 @@ use jdavidbakr\MailTracker\Model\SentEmail;
 
 class DeleteFileTest extends SetUpTest
 {
-
     /** @test */
     public function it_deletes_file_after_model_is_deleted()
     {
@@ -31,7 +30,7 @@ class DeleteFileTest extends SetUpTest
             'recipient_name' => 'name',
             'recipient_email' => 'email@test.com',
             'content' => null,
-            'meta' => collect(['content_file_path' => $filePath])
+            'meta' => collect(['content_file_path' => $filePath]),
         ]);
 
         Storage::disk($disk)->put($filePath, 'html-content of email');

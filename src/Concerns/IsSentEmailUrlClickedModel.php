@@ -6,10 +6,10 @@ use jdavidbakr\MailTracker\MailTracker;
 
 trait IsSentEmailUrlClickedModel
 {
-
     public function getConnectionName()
     {
         $connName = config('mail-tracker.connection');
+
         return $connName ?: config('database.default');
     }
 

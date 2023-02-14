@@ -15,8 +15,8 @@ class RecordTrackingJobTest extends SetUpTest
     {
         Event::fake();
         $track = MailTracker::sentEmailModel()->newQuery()->create([
-                'hash' => Str::random(32),
-            ]);
+            'hash' => Str::random(32),
+        ]);
         $job = new RecordTrackingJob($track, '127.0.0.1');
 
         $job->handle();
@@ -26,8 +26,8 @@ class RecordTrackingJobTest extends SetUpTest
                 $e->ip_address == '127.0.0.1';
         });
         $this->assertDatabaseHas('sent_emails', [
-                'id' => $track->id,
-                'opens' => 1,
-            ]);
+            'id' => $track->id,
+            'opens' => 1,
+        ]);
     }
 }

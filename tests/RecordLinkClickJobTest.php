@@ -15,8 +15,8 @@ class RecordLinkClickJobTest extends SetUpTest
     {
         Event::fake();
         $track = MailTracker::sentEmailModel()->newQuery()->create([
-                'hash' => Str::random(32),
-            ]);
+            'hash' => Str::random(32),
+        ]);
         $clicks = $track->clicks;
         $clicks++;
         $redirect = 'http://'.Str::random(15).'.com/'.Str::random(10).'/'.Str::random(10).'/'.rand(0, 100).'/'.rand(0, 100).'?page='.rand(0, 100).'&x='.Str::random(32);
@@ -30,8 +30,8 @@ class RecordLinkClickJobTest extends SetUpTest
                 $e->link_url === $redirect;
         });
         $this->assertDatabaseHas('sent_emails_url_clicked', [
-                'url' => $redirect,
-                'clicks' => 1,
-            ]);
+            'url' => $redirect,
+            'clicks' => 1,
+        ]);
     }
 }

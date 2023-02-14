@@ -18,6 +18,7 @@ class RecordTrackingJob implements ShouldQueue
     use SerializesModels;
 
     public $sentEmail;
+
     public $ipAddress;
 
     public function __construct($sentEmail, $ipAddress)

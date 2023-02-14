@@ -12,13 +12,13 @@ class PermanentBouncedMessageEvent implements ShouldQueue
     use SerializesModels;
 
     public $email_address;
+
     public $sent_email;
 
     /**
      * Create a new event instance.
      *
-     * @param string $email_address
-     * @param Model|SentEmailModel|null $sent_email
+     * @param  Model|SentEmailModel|null  $sent_email
      */
     public function __construct(string $email_address, Model|SentEmailModel|null $sent_email = null)
     {

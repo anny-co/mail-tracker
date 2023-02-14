@@ -9,8 +9,6 @@ use jdavidbakr\MailTracker\MailTrackerManager;
 
 class MessageSentListener
 {
-
-
     public function __construct(protected MailTrackerManager $manager)
     {
     }
@@ -22,7 +20,7 @@ class MessageSentListener
         $hash = optional($headers->get('X-Mailer-Hash'))->getBody();
         $sentEmail = MailTracker::sentEmailModel()->newQuery()->where('hash', $hash)->first();
 
-        if(!$sentEmail){
+        if (! $sentEmail) {
             return;
         }
 
@@ -32,7 +30,7 @@ class MessageSentListener
 
         $messageId = $driver->resolveMessageId($sentMessage);
 
-        if($messageId === null) {
+        if ($messageId === null) {
             $messageId = $sentMessage->getMessageId();
         }
 

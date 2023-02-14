@@ -44,12 +44,12 @@ class MigrateRecipientsCommand extends Command
 
     protected function migrateEmail($email)
     {
-        $sender_info = preg_match("/^([^<]*) <(.*)>$/", $email->sender, $matches);
+        $sender_info = preg_match('/^([^<]*) <(.*)>$/', $email->sender, $matches);
         if ($sender_info) {
             $sender_name = $matches[1];
             $sender_email = $matches[2];
         }
-        $recipient_info = preg_match("/^([^<]*) <(.*)>$/", $email->recipient, $matches);
+        $recipient_info = preg_match('/^([^<]*) <(.*)>$/', $email->recipient, $matches);
         if ($recipient_info) {
             $recipient_name = $matches[1];
             $recipient_email = $matches[2];

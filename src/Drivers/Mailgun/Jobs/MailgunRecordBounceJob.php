@@ -21,6 +21,7 @@ class MailgunRecordBounceJob implements ShouldQueue
 
     /**
      * See message structure
+     *
      * @docs https://documentation.mailgun.com/en/latest/api-events.html#event-structure
      */
     public array $eventData;
@@ -74,7 +75,7 @@ class MailgunRecordBounceJob implements ShouldQueue
         Event::dispatch(new TransientBouncedMessageEvent(
             Arr::get($this->eventData, 'recipient'),
             Arr::get($this->eventData, 'severity'),
-            Arr::get($this->eventData, 'delivery-status.message') . ' ' . Arr::get($this->eventData, 'delivery-status.description'),
+            Arr::get($this->eventData, 'delivery-status.message').' '.Arr::get($this->eventData, 'delivery-status.description'),
             $sent_email
         ));
     }

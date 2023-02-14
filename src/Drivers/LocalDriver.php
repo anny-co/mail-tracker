@@ -9,8 +9,7 @@ use jdavidbakr\MailTracker\Contracts\MailTrackerDriver;
 
 class LocalDriver implements MailTrackerDriver
 {
-
-    public function callback(Request $request) : Response
+    public function callback(Request $request): Response
     {
         return response('', 204);
     }

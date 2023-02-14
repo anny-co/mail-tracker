@@ -16,23 +16,23 @@ class RecordBounceJobTest extends SetUpTest
     {
         Event::fake();
         $track = MailTracker::sentEmailModel()->newQuery()->create([
-                'hash' => Str::random(32),
-            ]);
+            'hash' => Str::random(32),
+        ]);
         $message_id = Str::uuid();
         $track->message_id = $message_id;
         $track->save();
-        $message = (object)[
-            'mail' => (object)[
+        $message = (object) [
+            'mail' => (object) [
                 'messageId' => $message_id,
             ],
-            'bounce' => (object)[
-                'bouncedRecipients' => (object)[
-                    (object)[
-                       'emailAddress' => 'recipient@example.com'
-                    ]
+            'bounce' => (object) [
+                'bouncedRecipients' => (object) [
+                    (object) [
+                        'emailAddress' => 'recipient@example.com',
+                    ],
                 ],
-                'bounceType' => 'Permanent'
-            ]
+                'bounceType' => 'Permanent',
+            ],
         ];
         $job = new SesRecordBounceJob($message);
 
@@ -42,8 +42,8 @@ class RecordBounceJobTest extends SetUpTest
         $meta = $track->meta;
         $this->assertEquals([
             [
-                'emailAddress' => 'recipient@example.com'
-            ]
+                'emailAddress' => 'recipient@example.com',
+            ],
         ], $meta->get('failures'));
         $this->assertFalse($meta->get('success'));
         $this->assertEquals(json_decode(json_encode($message), true), $meta->get('sns_message_bounce'));
@@ -58,25 +58,25 @@ class RecordBounceJobTest extends SetUpTest
     {
         Event::fake();
         $track = MailTracker::sentEmailModel()->newQuery()->create([
-                'hash' => Str::random(32),
-            ]);
+            'hash' => Str::random(32),
+        ]);
         $message_id = Str::uuid();
         $track->message_id = $message_id;
         $track->save();
-        $message = (object)[
-            'mail' => (object)[
+        $message = (object) [
+            'mail' => (object) [
                 'messageId' => $message_id,
             ],
-            'bounce' => (object)[
-                'bouncedRecipients' => (object)[
-                    (object)[
-                       'emailAddress' => 'recipient@example.com',
-                       'diagnosticCode' => 'The Diagnostic Code',
-                    ]
+            'bounce' => (object) [
+                'bouncedRecipients' => (object) [
+                    (object) [
+                        'emailAddress' => 'recipient@example.com',
+                        'diagnosticCode' => 'The Diagnostic Code',
+                    ],
                 ],
                 'bounceType' => 'Transient',
                 'bounceSubType' => 'General',
-            ]
+            ],
         ];
         $job = new SesRecordBounceJob($message);
 
@@ -88,7 +88,7 @@ class RecordBounceJobTest extends SetUpTest
             [
                 'emailAddress' => 'recipient@example.com',
                 'diagnosticCode' => 'The Diagnostic Code',
-            ]
+            ],
         ], $meta->get('failures'));
         $this->assertFalse($meta->get('success'));
         $this->assertEquals(json_decode(json_encode($message), true), $meta->get('sns_message_bounce'));
@@ -105,24 +105,24 @@ class RecordBounceJobTest extends SetUpTest
     {
         Event::fake();
         $track = MailTracker::sentEmailModel()->newQuery()->create([
-                'hash' => Str::random(32),
-            ]);
+            'hash' => Str::random(32),
+        ]);
         $message_id = Str::uuid();
         $track->message_id = $message_id;
         $track->save();
-        $message = (object)[
-            'mail' => (object)[
+        $message = (object) [
+            'mail' => (object) [
                 'messageId' => $message_id,
             ],
-            'bounce' => (object)[
-                'bouncedRecipients' => (object)[
-                    (object)[
-                       'emailAddress' => 'recipient@example.com',
-                    ]
+            'bounce' => (object) [
+                'bouncedRecipients' => (object) [
+                    (object) [
+                        'emailAddress' => 'recipient@example.com',
+                    ],
                 ],
                 'bounceType' => 'Transient',
                 'bounceSubType' => 'General',
-            ]
+            ],
         ];
         $job = new SesRecordBounceJob($message);
 
@@ -133,7 +133,7 @@ class RecordBounceJobTest extends SetUpTest
         $this->assertEquals([
             [
                 'emailAddress' => 'recipient@example.com',
-            ]
+            ],
         ], $meta->get('failures'));
         $this->assertFalse($meta->get('success'));
         $this->assertEquals(json_decode(json_encode($message), true), $meta->get('sns_message_bounce'));

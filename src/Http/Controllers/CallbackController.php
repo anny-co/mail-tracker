@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace jdavidbakr\MailTracker\Http\Controllers;
@@ -11,17 +12,15 @@ use jdavidbakr\MailTracker\MailTrackerManager;
 
 class CallbackController extends Controller
 {
-
-    public function __invoke(Request $request, string $driver, MailTrackerManager $manager) : Response
+    public function __invoke(Request $request, string $driver, MailTrackerManager $manager): Response
     {
         /** @var MailTrackerDriver $driver */
         $driver = $manager->driver($driver);
 
-        if(!$driver) {
+        if (! $driver) {
             abort(404);
         }
 
         return $driver->callback($request);
     }
-
 }

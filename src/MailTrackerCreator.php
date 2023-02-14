@@ -18,7 +18,6 @@ use Symfony\Component\Mime\Part\TextPart;
 
 class MailTrackerCreator implements TrackerCreator
 {
-
     public function create(Email $message, string $mailer)
     {
         $headers = $message->getHeaders();
@@ -86,7 +85,7 @@ class MailTrackerCreator implements TrackerCreator
                         $part->getMediaSubtype(),
                         null
                     );
-                } else if ($part->getMediaSubtype() == 'alternative') {
+                } elseif ($part->getMediaSubtype() == 'alternative') {
                     if (method_exists($part, 'getParts')) {
                         foreach ($part->getParts() as $p) {
                             if ($p->getMediaSubtype() == 'html') {
@@ -111,11 +110,11 @@ class MailTrackerCreator implements TrackerCreator
             $originalHtml = $originalContent->getBody();
             if ($originalContent->getMediaSubtype() == 'html') {
                 $message->setBody(new TextPart(
-                        $this->handleTrackers($originalHtml, $hash),
-                        $message->getHtmlCharset(),
-                        $originalContent->getMediaSubtype(),
-                        null
-                    )
+                    $this->handleTrackers($originalHtml, $hash),
+                    $message->getHtmlCharset(),
+                    $originalContent->getMediaSubtype(),
+                    null
+                )
                 );
             }
         }

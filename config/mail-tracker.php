@@ -19,8 +19,8 @@ return [
     'drivers' => [
         'mailgun' => [
             'should-verify-signature' => true,
-            'signing-key' => ''
-        ]
+            'signing-key' => '',
+        ],
     ],
 
     /**
@@ -49,7 +49,7 @@ return [
         'prefix' => 'email-manager',
         'middleware' => [
             'web',
-            'can:see-sent-emails'
+            'can:see-sent-emails',
         ],
     ],
 

@@ -16,10 +16,10 @@ class PixelTracker implements Tracker
 
         $html = str_replace("\n", $linebreak, $html);
 
-        if (preg_match("/^(.*<body[^>]*>)(.*)$/", $html, $matches)) {
+        if (preg_match('/^(.*<body[^>]*>)(.*)$/', $html, $matches)) {
             $html = $matches[1].$matches[2].$trackingPixel;
         } else {
-            $html = $html . $trackingPixel;
+            $html = $html.$trackingPixel;
         }
         $html = str_replace($linebreak, "\n", $html);
 

@@ -15,12 +15,10 @@ use Symfony\Component\Mime\Header\Headers;
 
 class MailgunDriver implements MailTrackerDriver
 {
-
     public function __construct(
         protected string $signingKey,
         protected bool $shouldVerifySignature
-    )
-    {
+    ) {
     }
 
     public function resolveMessageId(SentMessage $message): ?string
@@ -31,7 +29,7 @@ class MailgunDriver implements MailTrackerDriver
         if ($mailgunHeader = $headers->get('X-Mailgun-Message-ID')) {
             $messageId = $mailgunHeader->getBody();
 
-            return (string)Str::of($messageId)->replace('<', '')->replace('>', '');
+            return (string) Str::of($messageId)->replace('<', '')->replace('>', '');
         }
 
         return null;
@@ -42,7 +40,7 @@ class MailgunDriver implements MailTrackerDriver
         $signatureData = $request->input('signature', []);
 
         if ($this->shouldVerifySignature) {
-            if (!$this->verifyWebhookSignature(
+            if (! $this->verifyWebhookSignature(
                 Arr::get($signatureData, 'timestamp'),
                 Arr::get($signatureData, 'token'),
                 Arr::get($signatureData, 'signature')
@@ -60,7 +58,6 @@ class MailgunDriver implements MailTrackerDriver
 
     /**
      * Verifies the webhook signature with an API key.
-     *
      */
     public function verifyWebhookSignature(int $timestamp, string $token, string $signature): bool
     {
@@ -68,16 +65,12 @@ class MailgunDriver implements MailTrackerDriver
             return false;
         }
 
-        $hmac = hash_hmac('sha256', $timestamp . $token, $this->signingKey);
+        $hmac = hash_hmac('sha256', $timestamp.$token, $this->signingKey);
 
         // hash_equals is constant time, but will not be introduced until PHP 5.6
         return hash_equals($hmac, $signature);
     }
 
-    /**
-     * @param array $eventData
-     * @return void
-     */
     protected function processNotification(array $eventData): void
     {
         switch (Arr::get($eventData, 'event')) {
@@ -111,5 +104,4 @@ class MailgunDriver implements MailTrackerDriver
         dispatch(new MailgunRecordComplaintJob($eventData))
             ->onQueue(config('mail-tracker.tracker-queue'));
     }
-
 }

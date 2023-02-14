@@ -19,7 +19,9 @@ class RecordLinkClickJob implements ShouldQueue
     use SerializesModels;
 
     public $sentEmail;
+
     public $url;
+
     public $ipAddress;
 
     public function retryUntil()

@@ -12,15 +12,16 @@ class LinkClickedEvent implements ShouldQueue
     use SerializesModels;
 
     public $sent_email;
+
     public $ip_address;
+
     public $link_url;
 
     /**
      * Create a new event instance.
      *
-     * @param Model|SentEmailModel $sent_email
-     * @param string $ip_address
-     * @param string $link_url
+     * @param  string  $ip_address
+     * @param  string  $link_url
      */
     public function __construct(Model|SentEmailModel $sent_email, $ip_address, $link_url)
     {

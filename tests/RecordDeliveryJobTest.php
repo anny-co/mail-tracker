@@ -15,22 +15,22 @@ class RecordDeliveryJobTest extends SetUpTest
     {
         Event::fake();
         $track = MailTracker::sentEmailModel()->newQuery()->create([
-                'hash' => Str::random(32),
-            ]);
+            'hash' => Str::random(32),
+        ]);
         $message_id = Str::uuid();
         $track->message_id = $message_id;
         $track->save();
-        $message = (object)[
-            'mail' => (object)[
+        $message = (object) [
+            'mail' => (object) [
                 'messageId' => $message_id,
             ],
-            'delivery' => (object)[
+            'delivery' => (object) [
                 'timestamp' => 12345,
-                'recipients' => (object)[
-                    'recipient@example.com'
+                'recipients' => (object) [
+                    'recipient@example.com',
                 ],
                 'smtpResponse' => 'the smtp response',
-            ]
+            ],
         ];
         $job = new SesRecordDeliveryJob($message);
 
@@ -51,87 +51,87 @@ class RecordDeliveryJobTest extends SetUpTest
     /** @test */
     public function it_handles_this_situation()
     {
-        $message = (object)[
+        $message = (object) [
             'notificationType' => 'Delivery',
             'mail' => (object) [
-                'timestamp' => "2020-04-07T15:07:53.347Z",
-                'source' => "mymove@churchonthemove.com",
-                'sourceArn' => "arn:aws:ses:us-east-1:819775105347:identity/churchonthemove.com",
-                'sourceIp' => "54.236.242.10",
-                'sendAccountId' => "819775105347",
-                'messageId' => "01000171552ef683-42a82c88-b847-47ca-9bb8-f46655398d01-000000",
-                'destination' => (object)[
-                    "mymove@churchonthemove.com",
-                    "kddavid05@yahoo.com"
+                'timestamp' => '2020-04-07T15:07:53.347Z',
+                'source' => 'mymove@churchonthemove.com',
+                'sourceArn' => 'arn:aws:ses:us-east-1:819775105347:identity/churchonthemove.com',
+                'sourceIp' => '54.236.242.10',
+                'sendAccountId' => '819775105347',
+                'messageId' => '01000171552ef683-42a82c88-b847-47ca-9bb8-f46655398d01-000000',
+                'destination' => (object) [
+                    'mymove@churchonthemove.com',
+                    'kddavid05@yahoo.com',
                 ],
                 'headersTruncated' => false,
-                'headers' => (object)[
-                    (object)[
+                'headers' => (object) [
+                    (object) [
                         'name' => 'Message-ID',
-                        'value' => "<58c15e034bd35bd98f750863e65545d6@swift.generated>"
+                        'value' => '<58c15e034bd35bd98f750863e65545d6@swift.generated>',
                     ],
-                    (object)[
+                    (object) [
                         'name' => 'Date',
-                        'value' => 'Tue, 07 Apr 2020 10:07:53 -0500'
+                        'value' => 'Tue, 07 Apr 2020 10:07:53 -0500',
                     ],
-                    (object)[
-                        'name' => "Subject",
-                        'value' => "Online Giving Notification"
+                    (object) [
+                        'name' => 'Subject',
+                        'value' => 'Online Giving Notification',
                     ],
-                    (object)[
+                    (object) [
                         'name' => 'From',
-                        'value' => "Church on the Move <mymove@churchonthemove.com>"
+                        'value' => 'Church on the Move <mymove@churchonthemove.com>',
                     ],
-                    (object)[
+                    (object) [
                         'name' => 'To',
-                        'value' => "kddavid05@yahoo.com"
+                        'value' => 'kddavid05@yahoo.com',
                     ],
-                    (object)[
+                    (object) [
                         'name' => 'Bcc',
-                        'value' => "mymove@churchonthemove.com"
+                        'value' => 'mymove@churchonthemove.com',
                     ],
-                    (object)[
+                    (object) [
                         'name' => 'MIME-Version',
                         'value' => '1.0',
                     ],
-                    (object)[
+                    (object) [
                         'name' => 'Content-Type',
-                        'value' => "text/html; charset=utf-8"
+                        'value' => 'text/html; charset=utf-8',
                     ],
-                    (object)[
-                        'name' => "Content-Transfer-Encoding",
-                        'value' => "quoted-printable"
+                    (object) [
+                        'name' => 'Content-Transfer-Encoding',
+                        'value' => 'quoted-printable',
                     ],
-                    (object)[
-                        'name' => "X-Mailer-Hash",
-                        'value' => "iFxkLyGt3z91BOvlGnce3dmH7XeCk5XD"
-                    ]
+                    (object) [
+                        'name' => 'X-Mailer-Hash',
+                        'value' => 'iFxkLyGt3z91BOvlGnce3dmH7XeCk5XD',
+                    ],
                 ],
-                'commenHeaders' => (object)[
-                    'from' => (object)[
-                        "Church on the Move <mymove@churchonthemove.com>"
+                'commenHeaders' => (object) [
+                    'from' => (object) [
+                        'Church on the Move <mymove@churchonthemove.com>',
                     ],
-                    'date' => "Tue, 07 Apr 2020 10:07:53 -0500",
-                    'to' => (object)[
-                        "kddavid05@yahoo.com"
+                    'date' => 'Tue, 07 Apr 2020 10:07:53 -0500',
+                    'to' => (object) [
+                        'kddavid05@yahoo.com',
                     ],
-                    'bcc' => (object)[
-                        "mymove@churchonthemove.com"
+                    'bcc' => (object) [
+                        'mymove@churchonthemove.com',
                     ],
-                    'messageId' => "<58c15e034bd35bd98f750863e65545d6@swift.generated>",
-                    'subject' => "Online Giving Notification"
-                ]
+                    'messageId' => '<58c15e034bd35bd98f750863e65545d6@swift.generated>',
+                    'subject' => 'Online Giving Notification',
+                ],
             ],
-            'delivery' => (object)[
-                'timestamp' => "2020-04-07T15:07:54.820Z",
+            'delivery' => (object) [
+                'timestamp' => '2020-04-07T15:07:54.820Z',
                 'processingTimeMillis' => 1473,
-                'recipients' => (object)[
-                    "kddavid05@yahoo.com"
+                'recipients' => (object) [
+                    'kddavid05@yahoo.com',
                 ],
-                'smtpResponse' => "250 ok dirdel",
-                'remoteMtaIp' => "98.136.96.91",
-                'reportingMTA' => "a48-114.smtp-out.amazonses.com"
-            ]
+                'smtpResponse' => '250 ok dirdel',
+                'remoteMtaIp' => '98.136.96.91',
+                'reportingMTA' => 'a48-114.smtp-out.amazonses.com',
+            ],
         ];
         Event::fake();
         $job = new SesRecordDeliveryJob($message);

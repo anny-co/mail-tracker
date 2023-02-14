@@ -7,16 +7,15 @@ use jdavidbakr\MailTracker\Contracts\MailerResolver;
 
 class MailTrackerMailerResolver implements MailerResolver
 {
-
     public function resolve(array $eventData = []): string|null
     {
         // 1. look at event data
-        if($mailer = Arr::get($eventData, 'mailer')) {
+        if ($mailer = Arr::get($eventData, 'mailer')) {
             return $mailer;
         }
 
         // 2. look at mailer tracker
-        if($mailer = MailTracker::$mailer){
+        if ($mailer = MailTracker::$mailer) {
             return $mailer;
         }
 
