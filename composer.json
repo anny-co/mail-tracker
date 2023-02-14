@@ -43,7 +43,7 @@
         }
     },
     "scripts": {
-        "test": "phpunit"
+        "test": "php vendor/bin/testbench package:test"
     },
     "extra": {
         "laravel": {
