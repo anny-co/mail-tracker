@@ -1,6 +1,6 @@
 <?php
 
-namespace jdavidbakr\MailTracker\Drivers;
+namespace jdavidbakr\MailTracker\Drivers\Ses;
 
 use Aws\Sns\Message as SNSMessage;
 use Aws\Sns\MessageValidator as SNSMessageValidator;
@@ -9,12 +9,12 @@ use Illuminate\Http\Response;
 use Illuminate\Mail\SentMessage;
 use Illuminate\Support\Facades\Http;
 use jdavidbakr\MailTracker\Contracts\MailTrackerDriver;
-use jdavidbakr\MailTracker\Jobs\RecordBounceJob;
-use jdavidbakr\MailTracker\Jobs\RecordComplaintJob;
-use jdavidbakr\MailTracker\Jobs\RecordDeliveryJob;
+use jdavidbakr\MailTracker\Drivers\Ses\Jobs\SesRecordBounceJob;
+use jdavidbakr\MailTracker\Drivers\Ses\Jobs\SesRecordComplaintJob;
+use jdavidbakr\MailTracker\Drivers\Ses\Jobs\SesRecordDeliveryJob;
 
 
-class SNSDriver implements MailTrackerDriver
+class SesDriver implements MailTrackerDriver
 {
     public function callback(Request $request) : Response
     {
@@ -81,19 +81,19 @@ class SNSDriver implements MailTrackerDriver
 
     protected function process_delivery($message)
     {
-        RecordDeliveryJob::dispatch($message)
+        SesRecordDeliveryJob::dispatch($message)
             ->onQueue(config('mail-tracker.tracker-queue'));
     }
 
     public function process_bounce($message)
     {
-        RecordBounceJob::dispatch($message)
+        SesRecordBounceJob::dispatch($message)
             ->onQueue(config('mail-tracker.tracker-queue'));
     }
 
     public function process_complaint($message)
     {
-        RecordComplaintJob::dispatch($message)
+        SesRecordComplaintJob::dispatch($message)
             ->onQueue(config('mail-tracker.tracker-queue'));
     }
 }

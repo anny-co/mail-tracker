@@ -4,8 +4,8 @@ namespace jdavidbakr\MailTracker\Tests;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
+use jdavidbakr\MailTracker\Drivers\Ses\Jobs\SesRecordComplaintJob;
 use jdavidbakr\MailTracker\Events\ComplaintMessageEvent;
-use jdavidbakr\MailTracker\Jobs\RecordComplaintJob;
 use jdavidbakr\MailTracker\MailTracker;
 
 class RecordComplaintJobTest extends SetUpTest
@@ -33,7 +33,7 @@ class RecordComplaintJobTest extends SetUpTest
                 ],
             ]
         ];
-        $job = new RecordComplaintJob($message);
+        $job = new SesRecordComplaintJob($message);
 
         $job->handle();
 

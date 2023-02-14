@@ -19,6 +19,4 @@ class LocalDriver implements MailTrackerDriver
     {
         return $message->getMessageId();
     }
-
-
 }

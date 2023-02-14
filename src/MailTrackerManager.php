@@ -7,7 +7,7 @@ use Illuminate\Support\Manager;
 use jdavidbakr\MailTracker\Contracts\MailTrackerDriver;
 use jdavidbakr\MailTracker\Drivers\LocalDriver;
 use jdavidbakr\MailTracker\Drivers\Mailgun\MailgunDriver;
-use jdavidbakr\MailTracker\Drivers\SNSDriver;
+use jdavidbakr\MailTracker\Drivers\Ses\SesDriver;
 
 class MailTrackerManager extends Manager
 {
@@ -43,19 +43,19 @@ class MailTrackerManager extends Manager
     }
 
     /**
-     * @return SNSDriver
+     * @return SesDriver
      */
     public function createSnsDriver(): MailTrackerDriver
     {
-        return new SNSDriver();
+        return new SesDriver();
     }
 
     /**
-     * @return SNSDriver
+     * @return SesDriver
      */
     public function createSesDriver(): MailTrackerDriver
     {
-        return new SNSDriver();
+        return new SesDriver();
     }
 
     public function createMailgunDriver(): MailTrackerDriver

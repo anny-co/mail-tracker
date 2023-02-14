@@ -4,8 +4,8 @@ namespace jdavidbakr\MailTracker\Tests;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
+use jdavidbakr\MailTracker\Drivers\Ses\Jobs\SesRecordDeliveryJob;
 use jdavidbakr\MailTracker\Events\EmailDeliveredEvent;
-use jdavidbakr\MailTracker\Jobs\RecordDeliveryJob;
 use jdavidbakr\MailTracker\MailTracker;
 
 class RecordDeliveryJobTest extends SetUpTest
@@ -32,7 +32,7 @@ class RecordDeliveryJobTest extends SetUpTest
                 'smtpResponse' => 'the smtp response',
             ]
         ];
-        $job = new RecordDeliveryJob($message);
+        $job = new SesRecordDeliveryJob($message);
 
         $job->handle();
 
@@ -134,7 +134,7 @@ class RecordDeliveryJobTest extends SetUpTest
             ]
         ];
         Event::fake();
-        $job = new RecordDeliveryJob($message);
+        $job = new SesRecordDeliveryJob($message);
 
         $job->handle();
 

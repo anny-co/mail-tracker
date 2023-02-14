@@ -1,6 +1,6 @@
 <?php
 
-namespace jdavidbakr\MailTracker\Jobs;
+namespace jdavidbakr\MailTracker\Drivers\Ses\Jobs;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -12,7 +12,7 @@ use jdavidbakr\MailTracker\Events\PermanentBouncedMessageEvent;
 use jdavidbakr\MailTracker\Events\TransientBouncedMessageEvent;
 use jdavidbakr\MailTracker\MailTracker;
 
-class RecordBounceJob implements ShouldQueue
+class SesRecordBounceJob implements ShouldQueue
 {
     use Dispatchable;
     use InteractsWithQueue;

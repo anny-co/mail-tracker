@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace jdavidbakr\MailTracker\Tests;
 
-use jdavidbakr\MailTracker\Drivers\SNSDriver;
+use jdavidbakr\MailTracker\Drivers\Ses\SesDriver;
 use jdavidbakr\MailTracker\MailTrackerManager;
 use Mockery\MockInterface;
 
@@ -17,7 +17,7 @@ class MailTrackerDriverTest extends SetUpTest
         $manager = $this->app->get(MailTrackerManager::class);
 
         $manager->extend('ses', function(){
-            return \Mockery::mock(SNSDriver::class, function(MockInterface $mock) {
+            return \Mockery::mock(SesDriver::class, function(MockInterface $mock) {
                 $mock->shouldReceive('callback')
                     ->andReturn(response('success'));
             });

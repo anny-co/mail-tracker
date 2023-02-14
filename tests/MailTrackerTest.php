@@ -18,13 +18,13 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Str;
+use jdavidbakr\MailTracker\Drivers\Ses\Jobs\SesRecordBounceJob;
+use jdavidbakr\MailTracker\Drivers\Ses\Jobs\SesRecordComplaintJob;
+use jdavidbakr\MailTracker\Drivers\Ses\Jobs\SesRecordDeliveryJob;
 use jdavidbakr\MailTracker\Events\EmailSentEvent;
 use jdavidbakr\MailTracker\Events\LinkClickedEvent;
 use jdavidbakr\MailTracker\Exceptions\BadUrlLink;
 use jdavidbakr\MailTracker\Http\Controllers\CallbackController;
-use jdavidbakr\MailTracker\Jobs\RecordBounceJob;
-use jdavidbakr\MailTracker\Jobs\RecordComplaintJob;
-use jdavidbakr\MailTracker\Jobs\RecordDeliveryJob;
 use jdavidbakr\MailTracker\Jobs\RecordLinkClickJob;
 use jdavidbakr\MailTracker\Jobs\RecordTrackingJob;
 use jdavidbakr\MailTracker\Listeners\MessageSendingListener;
@@ -800,7 +800,7 @@ class MailTrackerTest extends SetUpTest
         ]);
 
         $response->assertSee('notification processed');
-        Bus::assertDispatched(RecordDeliveryJob::class, function ($job) use ($message) {
+        Bus::assertDispatched(SesRecordDeliveryJob::class, function ($job) use ($message) {
             return $job->message == (object)$message &&
                 $job->queue == 'alt-queue';
         });
@@ -829,7 +829,7 @@ class MailTrackerTest extends SetUpTest
         ]);
 
         $response->assertSee('notification processed');
-        Bus::assertDispatched(RecordBounceJob::class, function ($job) use ($message) {
+        Bus::assertDispatched(SesRecordBounceJob::class, function ($job) use ($message) {
             return $job->message == (object)$message &&
                 $job->queue == 'alt-queue';
         });
@@ -858,7 +858,7 @@ class MailTrackerTest extends SetUpTest
         ]);
 
         $response->assertSee('notification processed');
-        Bus::assertDispatched(RecordComplaintJob::class, function ($job) use ($message) {
+        Bus::assertDispatched(SesRecordComplaintJob::class, function ($job) use ($message) {
             return $job->message == (object)$message &&
                 $job->queue == 'alt-queue';
         });

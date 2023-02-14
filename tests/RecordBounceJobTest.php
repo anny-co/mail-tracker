@@ -4,9 +4,9 @@ namespace jdavidbakr\MailTracker\Tests;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
+use jdavidbakr\MailTracker\Drivers\Ses\Jobs\SesRecordBounceJob;
 use jdavidbakr\MailTracker\Events\PermanentBouncedMessageEvent;
 use jdavidbakr\MailTracker\Events\TransientBouncedMessageEvent;
-use jdavidbakr\MailTracker\Jobs\RecordBounceJob;
 use jdavidbakr\MailTracker\MailTracker;
 
 class RecordBounceJobTest extends SetUpTest
@@ -34,7 +34,7 @@ class RecordBounceJobTest extends SetUpTest
                 'bounceType' => 'Permanent'
             ]
         ];
-        $job = new RecordBounceJob($message);
+        $job = new SesRecordBounceJob($message);
 
         $job->handle();
 
@@ -78,7 +78,7 @@ class RecordBounceJobTest extends SetUpTest
                 'bounceSubType' => 'General',
             ]
         ];
-        $job = new RecordBounceJob($message);
+        $job = new SesRecordBounceJob($message);
 
         $job->handle();
 
@@ -124,7 +124,7 @@ class RecordBounceJobTest extends SetUpTest
                 'bounceSubType' => 'General',
             ]
         ];
-        $job = new RecordBounceJob($message);
+        $job = new SesRecordBounceJob($message);
 
         $job->handle();
 
