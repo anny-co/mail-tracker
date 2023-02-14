@@ -14,6 +14,16 @@ return [
     ],
 
     /**
+     * Options for drivers
+     */
+    'drivers' => [
+        'mailgun' => [
+            'should-verify-signature' => true,
+            'signing-key' => ''
+        ]
+    ],
+
+    /**
      * Optionally expire old emails, set to 0 to keep forever.
      */
     'expire-days' => 60,

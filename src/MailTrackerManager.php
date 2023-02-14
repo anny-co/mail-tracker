@@ -6,7 +6,7 @@ namespace jdavidbakr\MailTracker;
 use Illuminate\Support\Manager;
 use jdavidbakr\MailTracker\Contracts\MailTrackerDriver;
 use jdavidbakr\MailTracker\Drivers\LocalDriver;
-use jdavidbakr\MailTracker\Drivers\SMTPDriver;
+use jdavidbakr\MailTracker\Drivers\Mailgun\MailgunDriver;
 use jdavidbakr\MailTracker\Drivers\SNSDriver;
 
 class MailTrackerManager extends Manager
@@ -17,12 +17,10 @@ class MailTrackerManager extends Manager
         return 'ses';
     }
 
-    /**
-     * @return SMTPDriver
-     */
+
     public function createSmtpDriver(): MailTrackerDriver
     {
-        return new SMTPDriver();
+        return new LocalDriver();
     }
 
     public function createArrayDriver(): MailTrackerDriver
@@ -58,5 +56,16 @@ class MailTrackerManager extends Manager
     public function createSesDriver(): MailTrackerDriver
     {
         return new SNSDriver();
+    }
+
+    public function createMailgunDriver(): MailTrackerDriver
+    {
+        $signingKey = config('mail-tracker.drivers.mailgun.signing-key',
+            config('services.mailgun.signing_key')
+        );
+
+        $shouldVerifySignature = config('mail-tracker.drivers.mailgun.should-verify-signature');
+
+        return new MailgunDriver($signingKey, $shouldVerifySignature);
     }
 }

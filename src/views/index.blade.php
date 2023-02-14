@@ -11,6 +11,9 @@
                 <h4 class="text-center">
                     SNS Endpoint: {{ route('mailTracker_SNS') }}
                 </h4>
+                <h4 class="text-center">
+                    Mailgun Endpoint: {{ route('mailTracker_callback', ['driver' => 'mailgun']) }}
+                </h4>
             </div>
         </div>
         <div class="row">
