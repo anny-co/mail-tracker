@@ -3,12 +3,11 @@
 namespace jdavidbakr\MailTracker\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
 use jdavidbakr\MailTracker\Exceptions\BadUrlLink;
+use jdavidbakr\MailTracker\Jobs\RecordLinkClickJob;
+use jdavidbakr\MailTracker\Jobs\RecordTrackingJob;
 use jdavidbakr\MailTracker\MailTracker;
-use jdavidbakr\MailTracker\RecordLinkClickJob;
-use jdavidbakr\MailTracker\RecordTrackingJob;
 
 class MailTrackerController extends Controller
 {

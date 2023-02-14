@@ -1,14 +1,15 @@
 <?php
 
-namespace jdavidbakr\MailTracker;
+namespace jdavidbakr\MailTracker\Jobs;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Event;
 use jdavidbakr\MailTracker\Events\ComplaintMessageEvent;
+use jdavidbakr\MailTracker\MailTracker;
 
 class RecordComplaintJob implements ShouldQueue
 {

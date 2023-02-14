@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use jdavidbakr\MailTracker\Events\PermanentBouncedMessageEvent;
 use jdavidbakr\MailTracker\Events\TransientBouncedMessageEvent;
+use jdavidbakr\MailTracker\Jobs\RecordBounceJob;
 use jdavidbakr\MailTracker\MailTracker;
-use jdavidbakr\MailTracker\RecordBounceJob;
 
 class RecordBounceJobTest extends SetUpTest
 {

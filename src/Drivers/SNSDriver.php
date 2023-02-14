@@ -9,9 +9,9 @@ use Illuminate\Http\Response;
 use Illuminate\Mail\SentMessage;
 use Illuminate\Support\Facades\Http;
 use jdavidbakr\MailTracker\Contracts\MailTrackerDriver;
-use jdavidbakr\MailTracker\RecordBounceJob;
-use jdavidbakr\MailTracker\RecordComplaintJob;
-use jdavidbakr\MailTracker\RecordDeliveryJob;
+use jdavidbakr\MailTracker\Jobs\RecordBounceJob;
+use jdavidbakr\MailTracker\Jobs\RecordComplaintJob;
+use jdavidbakr\MailTracker\Jobs\RecordDeliveryJob;
 
 
 class SNSDriver implements MailTrackerDriver

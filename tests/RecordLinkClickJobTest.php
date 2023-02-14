@@ -2,14 +2,11 @@
 
 namespace jdavidbakr\MailTracker\Tests;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Event;
-use jdavidbakr\MailTracker\MailTracker;
-use jdavidbakr\MailTracker\RecordBounceJob;
-use jdavidbakr\MailTracker\RecordDeliveryJob;
-use jdavidbakr\MailTracker\RecordComplaintJob;
-use jdavidbakr\MailTracker\RecordLinkClickJob;
+use Illuminate\Support\Str;
 use jdavidbakr\MailTracker\Events\LinkClickedEvent;
+use jdavidbakr\MailTracker\Jobs\RecordLinkClickJob;
+use jdavidbakr\MailTracker\MailTracker;
 
 class RecordLinkClickJobTest extends SetUpTest
 {
