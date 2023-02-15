@@ -2,6 +2,7 @@
 
 namespace jdavidbakr\MailTracker\Drivers\Ses\Jobs;
 
+use Aws\Sns\Message as SNSMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -13,37 +14,30 @@ use jdavidbakr\MailTracker\MailTracker;
 
 class SesRecordDeliveryJob implements ShouldQueue
 {
-    use Dispatchable;
-    use InteractsWithQueue;
-    use Queueable;
-    use SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $message;
-
-    public function __construct($message)
+    public function __construct(public SNSMessage $message)
     {
-        $this->message = $message;
-    }
-
-    public function retryUntil()
-    {
-        return now()->addDays(5);
     }
 
     public function handle()
     {
-        $sent_email = MailTracker::sentEmailModel()->newQuery()->where('message_id', $this->message->mail->messageId)->first();
-        if ($sent_email) {
-            $meta = collect($sent_email->meta);
+        $sentEmail = MailTracker::sentEmailModel()
+            ->newQuery()
+            ->where('message_id', $this->message->mail->messageId)
+            ->first();
+
+        if ($sentEmail) {
+            $meta = collect($sentEmail->meta);
             $meta->put('smtpResponse', $this->message->delivery->smtpResponse);
             $meta->put('success', true);
             $meta->put('delivered_at', $this->message->delivery->timestamp);
             $meta->put('sns_message_delivery', $this->message); // append the full message received from SNS to the 'meta' field
-            $sent_email->meta = $meta;
-            $sent_email->save();
+            $sentEmail->meta = $meta;
+            $sentEmail->save();
 
             foreach ($this->message->delivery->recipients as $recipient) {
-                Event::dispatch(new EmailDeliveredEvent($recipient, $sent_email));
+                Event::dispatch(new EmailDeliveredEvent($recipient, $sentEmail));
             }
         }
     }

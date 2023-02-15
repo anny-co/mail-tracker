@@ -35,9 +35,9 @@ class SesDriver implements MailTrackerDriver
 
         switch ($message->offsetGet('Type')) {
             case 'SubscriptionConfirmation':
-                return $this->confirm_subscription($message);
+                return $this->confirmSubscription($message);
             case 'Notification':
-                return $this->process_notification($message);
+                return $this->processNotification($message);
         }
 
         return response('', 204);
@@ -55,46 +55,46 @@ class SesDriver implements MailTrackerDriver
         return null;
     }
 
-    protected function confirm_subscription($message): Response
+    protected function confirmSubscription(SNSMessage $message): Response
     {
         Http::get($message->offsetGet('SubscribeURL'));
 
         return response('subscription confirmed');
     }
 
-    protected function process_notification($message): Response
+    protected function processNotification(SNSMessage $message): Response
     {
         $message = json_decode($message->offsetGet('Message'));
         switch ($message->notificationType) {
             case 'Delivery':
-                $this->process_delivery($message);
+                $this->processDelivery($message);
                 break;
             case 'Bounce':
-                $this->process_bounce($message);
+                $this->processBounce($message);
                 break;
             case 'Complaint':
-                $this->process_complaint($message);
+                $this->processComplaint($message);
                 break;
         }
 
         return response('notification processed');
     }
 
-    protected function process_delivery($message)
+    protected function processDelivery(SNSMessage $message)
     {
-        SesRecordDeliveryJob::dispatch($message)
+        dispatch(new SesRecordDeliveryJob($message))
             ->onQueue(config('mail-tracker.tracker-queue'));
     }
 
-    public function process_bounce($message)
+    public function processBounce(SNSMessage $message)
     {
-        SesRecordBounceJob::dispatch($message)
+        dispatch(new SesRecordBounceJob($message))
             ->onQueue(config('mail-tracker.tracker-queue'));
     }
 
-    public function process_complaint($message)
+    public function processComplaint(SNSMessage $message)
     {
-        SesRecordComplaintJob::dispatch($message)
+        dispatch(new SesRecordComplaintJob($message))
             ->onQueue(config('mail-tracker.tracker-queue'));
     }
 }

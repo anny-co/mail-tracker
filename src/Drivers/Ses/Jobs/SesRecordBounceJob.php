@@ -2,76 +2,72 @@
 
 namespace jdavidbakr\MailTracker\Drivers\Ses\Jobs;
 
+use Aws\Sns\Message as SNSMessage;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Event;
+use jdavidbakr\MailTracker\Contracts\SentEmailModel;
 use jdavidbakr\MailTracker\Events\PermanentBouncedMessageEvent;
 use jdavidbakr\MailTracker\Events\TransientBouncedMessageEvent;
 use jdavidbakr\MailTracker\MailTracker;
 
 class SesRecordBounceJob implements ShouldQueue
 {
-    use Dispatchable;
-    use InteractsWithQueue;
-    use Queueable;
-    use SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $message;
-
-    public function __construct($message)
+    public function __construct(public SNSMessage $message)
     {
-        $this->message = $message;
-    }
-
-    public function retryUntil()
-    {
-        return now()->addDays(5);
     }
 
     public function handle()
     {
-        $sent_email = MailTracker::sentEmailModel()->newQuery()->where('message_id', $this->message->mail->messageId)->first();
-        if ($sent_email) {
-            $meta = collect($sent_email->meta);
-            $current_codes = [];
+        $sentEmail = MailTracker::sentEmailModel()
+            ->newQuery()
+            ->where('message_id', $this->message->mail->messageId)
+            ->first();
+
+        if ($sentEmail) {
+            $meta = collect($sentEmail->meta);
+            $currentCode = [];
             if ($meta->has('failures')) {
-                $current_codes = $meta->get('failures');
+                $currentCode = $meta->get('failures');
             }
             foreach ($this->message->bounce->bouncedRecipients as $failure_details) {
-                $current_codes[] = $failure_details;
+                $currentCode[] = $failure_details;
             }
-            $meta->put('failures', $current_codes);
+            $meta->put('failures', $currentCode);
             $meta->put('success', false);
             $meta->put('sns_message_bounce', $this->message); // append the full message received from SNS to the 'meta' field
-            $sent_email->meta = $meta;
-            $sent_email->save();
+            $sentEmail->meta = $meta;
+            $sentEmail->save();
 
             if ($this->message->bounce->bounceType == 'Permanent') {
-                $this->permanentBounce($sent_email);
+                $this->permanentBounce($sentEmail);
             } else {
-                $this->transientBounce($sent_email);
+                $this->transientBounce($sentEmail);
             }
         }
     }
 
-    protected function permanentBounce($sent_email)
+    protected function permanentBounce(Model|SentEmailModel $sendEmail): void
     {
         foreach ($this->message->bounce->bouncedRecipients as $recipient) {
-            Event::dispatch(new PermanentBouncedMessageEvent($recipient->emailAddress, $sent_email));
+            Event::dispatch(new PermanentBouncedMessageEvent($recipient->emailAddress, $sendEmail));
         }
     }
 
-    protected function transientBounce($sent_email)
+    protected function transientBounce(Model|SentEmailModel $sentEmail): void
     {
         foreach ($this->message->bounce->bouncedRecipients as $recipient) {
             Event::dispatch(new TransientBouncedMessageEvent(
                 $recipient->emailAddress,
                 $this->message->bounce->bounceSubType,
                 optional($recipient)->diagnosticCode ?: '',
-                $sent_email
+                $sentEmail
             ));
         }
     }

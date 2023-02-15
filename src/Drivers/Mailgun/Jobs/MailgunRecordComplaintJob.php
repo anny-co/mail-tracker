@@ -10,6 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use jdavidbakr\MailTracker\Events\ComplaintMessageEvent;
+use jdavidbakr\MailTracker\MailTracker;
 
 class MailgunRecordComplaintJob implements ShouldQueue
 {
@@ -23,34 +24,28 @@ class MailgunRecordComplaintJob implements ShouldQueue
      *
      * @docs https://documentation.mailgun.com/en/latest/api-events.html#event-structure
      */
-    public array $eventData;
-
-    public function __construct($eventData)
+    public function __construct(public array $eventData)
     {
-        $this->eventData = $eventData;
-    }
-
-    public function retryUntil()
-    {
-        return now()->addDays(5);
     }
 
     public function handle()
     {
-        $model = config('mail-tracker.sent_email_model');
         $messageId = Arr::get($this->eventData, 'message.headers.message-id');
+        $sentEmail = MailTracker::sentEmailModel()
+            ->newQuery()
+            ->where('message_id', $messageId)
+            ->first();
 
-        $sent_email = $model::where('message_id', $messageId)->first();
-        if ($sent_email) {
-            $meta = collect($sent_email->meta);
+        if ($sentEmail) {
+            $meta = collect($sentEmail->meta);
             $meta->put('complaint', true);
             $meta->put('success', false);
             $meta->put('complaint_time', Arr::get($this->eventData, 'timestamp'));
             $meta->put('mailgun_message_complaint', $this->eventData); // append the full message received from Mailgun to the 'meta' field
-            $sent_email->meta = $meta;
-            $sent_email->save();
+            $sentEmail->meta = $meta;
+            $sentEmail->save();
 
-            Event::dispatch(new ComplaintMessageEvent(Arr::get($this->eventData, 'recipient'), $sent_email));
+            Event::dispatch(new ComplaintMessageEvent(Arr::get($this->eventData, 'recipient'), $sentEmail));
         }
     }
 }

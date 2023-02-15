@@ -4,53 +4,47 @@ namespace jdavidbakr\MailTracker\Jobs;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Event;
+use jdavidbakr\MailTracker\Contracts\SentEmailModel;
 use jdavidbakr\MailTracker\Events\LinkClickedEvent;
 use jdavidbakr\MailTracker\MailTracker;
 
 class RecordLinkClickJob implements ShouldQueue
 {
-    use Dispatchable;
-    use InteractsWithQueue;
-    use Queueable;
-    use SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $sentEmail;
-
-    public $url;
-
-    public $ipAddress;
-
-    public function retryUntil()
-    {
-        return now()->addDays(5);
-    }
-
-    public function __construct($sentEmail, $url, $ipAddress)
-    {
-        $this->sentEmail = $sentEmail;
-        $this->url = $url;
-        $this->ipAddress = $ipAddress;
+    public function __construct(
+        public Model|SentEmailModel $sentEmail,
+        public string $url,
+        public string $ipAddress
+    ) {
     }
 
     public function handle()
     {
         $this->sentEmail->clicks++;
         $this->sentEmail->save();
-        $url_clicked = MailTracker::sentEmailUrlClickedModel()->newQuery()->where('url', $this->url)->where('hash', $this->sentEmail->hash)->first();
-        if ($url_clicked) {
-            $url_clicked->clicks++;
-            $url_clicked->save();
+        $urlClicked = MailTracker::sentEmailUrlClickedModel()
+            ->newQuery()
+            ->where('url', $this->url)
+            ->where('hash', $this->sentEmail->hash)
+            ->firstOrCreate();
+
+        if ($urlClicked) {
+            $urlClicked->clicks++;
+            $urlClicked->save();
         } else {
-            $url_clicked = MailTracker::sentEmailUrlClickedModel()->newQuery()->create([
+            MailTracker::sentEmailUrlClickedModel()->newQuery()->create([
                 'sent_email_id' => $this->sentEmail->id,
                 'url' => $this->url,
                 'hash' => $this->sentEmail->hash,
             ]);
         }
+
         Event::dispatch(new LinkClickedEvent(
             $this->sentEmail,
             $this->ipAddress,

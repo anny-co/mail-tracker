@@ -4,32 +4,22 @@ namespace jdavidbakr\MailTracker\Jobs;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Event;
+use jdavidbakr\MailTracker\Contracts\SentEmailModel;
 use jdavidbakr\MailTracker\Events\ViewEmailEvent;
 
 class RecordTrackingJob implements ShouldQueue
 {
-    use Dispatchable;
-    use InteractsWithQueue;
-    use Queueable;
-    use SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $sentEmail;
-
-    public $ipAddress;
-
-    public function __construct($sentEmail, $ipAddress)
+    public function __construct(
+        public Model|SentEmailModel $sentEmail,
+        public string $ipAddress)
     {
-        $this->sentEmail = $sentEmail;
-        $this->ipAddress = $ipAddress;
-    }
-
-    public function retryUntil()
-    {
-        return now()->addDays(5);
     }
 
     public function handle()

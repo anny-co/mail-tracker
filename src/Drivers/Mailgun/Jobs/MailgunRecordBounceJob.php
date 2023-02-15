@@ -11,6 +11,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Event;
 use jdavidbakr\MailTracker\Events\PermanentBouncedMessageEvent;
 use jdavidbakr\MailTracker\Events\TransientBouncedMessageEvent;
+use jdavidbakr\MailTracker\MailTracker;
 
 class MailgunRecordBounceJob implements ShouldQueue
 {
@@ -24,59 +25,54 @@ class MailgunRecordBounceJob implements ShouldQueue
      *
      * @docs https://documentation.mailgun.com/en/latest/api-events.html#event-structure
      */
-    public array $eventData;
-
-    public function __construct($eventData)
+    public function __construct(public array $eventData)
     {
-        $this->eventData = $eventData;
-    }
-
-    public function retryUntil()
-    {
-        return now()->addDays(5);
     }
 
     public function handle()
     {
-        $model = config('mail-tracker.sent_email_model');
         $messageId = Arr::get($this->eventData, 'message.headers.message-id');
-        $sent_email = $model::where('message_id', $messageId)->first();
-        if ($sent_email) {
-            $meta = collect($sent_email->meta);
-            $current_codes = [];
+        $sentEmail = MailTracker::sentEmailModel()
+            ->newQuery()
+            ->where('message_id', $messageId)
+            ->first();
+
+        if ($sentEmail) {
+            $meta = collect($sentEmail->meta);
+            $currentCodes = [];
             if ($meta->has('failures')) {
-                $current_codes = $meta->get('failures');
+                $currentCodes = $meta->get('failures');
             }
-            $current_codes[] = ['emailAddress' => Arr::get($this->eventData, 'recipient')];
-            $meta->put('failures', $current_codes);
+            $currentCodes[] = ['emailAddress' => Arr::get($this->eventData, 'recipient')];
+            $meta->put('failures', $currentCodes);
             $meta->put('success', false);
             $meta->put('mailgun_message_bounce', $this->eventData); // append the full message received from Mailgun to the 'meta' field
-            $sent_email->meta = $meta;
-            $sent_email->save();
+            $sentEmail->meta = $meta;
+            $sentEmail->save();
 
             if (Arr::has($this->eventData, 'reject')) {
                 // handle rejection
-                $this->permanentBounce($sent_email);
+                $this->permanentBounce($sentEmail);
             } elseif (Arr::get($this->eventData, 'severity') === 'permanent') {
-                $this->permanentBounce($sent_email);
+                $this->permanentBounce($sentEmail);
             } else {
-                $this->transientBounce($sent_email);
+                $this->transientBounce($sentEmail);
             }
         }
     }
 
-    protected function permanentBounce($sent_email)
+    protected function permanentBounce($sentEmail)
     {
-        Event::dispatch(new PermanentBouncedMessageEvent(Arr::get($this->eventData, 'recipient'), $sent_email));
+        Event::dispatch(new PermanentBouncedMessageEvent(Arr::get($this->eventData, 'recipient'), $sentEmail));
     }
 
-    protected function transientBounce($sent_email)
+    protected function transientBounce($sentEmail)
     {
         Event::dispatch(new TransientBouncedMessageEvent(
             Arr::get($this->eventData, 'recipient'),
             Arr::get($this->eventData, 'severity'),
             Arr::get($this->eventData, 'delivery-status.message').' '.Arr::get($this->eventData, 'delivery-status.description'),
-            $sent_email
+            $sentEmail
         ));
     }
 }
