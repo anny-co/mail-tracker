@@ -23,8 +23,6 @@ class MailTrackerMailerResolver implements MailerResolver
         // We assume here that the developer is only using one configured driver.
         // When using multiple driver for different mails this could probably
         // set the wrong driver.
-        $mailer = config('mail.driver') ?? config('mail.default');
-
-        return $mailer;
+        return config('mail.driver') ?? config('mail.default');
     }
 }
