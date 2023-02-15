@@ -14,10 +14,7 @@ use jdavidbakr\MailTracker\MailTracker;
 
 class MailgunRecordComplaintJob implements ShouldQueue
 {
-    use Dispatchable;
-    use InteractsWithQueue;
-    use Queueable;
-    use SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * See message structure

@@ -15,10 +15,7 @@ use jdavidbakr\MailTracker\MailTracker;
 
 class MailgunRecordBounceJob implements ShouldQueue
 {
-    use Dispatchable;
-    use InteractsWithQueue;
-    use Queueable;
-    use SerializesModels;
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     /**
      * See message structure
