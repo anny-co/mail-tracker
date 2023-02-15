@@ -360,8 +360,27 @@ If you use Amazon SES, you can add some additional information to your tracking.
 
 
 ### Extending with drivers
-Driver name must match driver name in Laravel mail
 
+By using drivers, you can extend MailTracker to support different email providers and their functionality (such as callbacks on bounce notifications).
+
+To create a new driver, create a class (for example: `SendgridDriver`, and implement the `MailTrackerDriver` interface).
+
+Then in the `boot()` method of one of your service providers, extend the `MailTrackerManager` with your new driver;
+
+```php
+$manager = $this->app->make(MailTrackerManager::class);
+$manager->extend('sendgrid', function($app) {
+    return new SendgridDriver();
+});
+```
+
+An implementation using Mailgun is available in `src/Drivers/Mailgun`.
+
+#### MailTrackerDriver
+* `callback`
+   If your mail provider sends notifications (such as webhooks), you can process them in this function
+* `resolveMessageId`
+   Retrieves the unique message ID from the `SentMessage` class
 
 ## Views
 
