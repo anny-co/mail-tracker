@@ -21,9 +21,9 @@ class RecordTrackingJobTest extends SetUpTest
 
         $job->handle();
 
-        Event::assertDispatched(ViewEmailEvent::class, function ($e) use ($track) {
-            return $track->id == $e->sent_email->id &&
-                $e->ip_address == '127.0.0.1';
+        Event::assertDispatched(ViewEmailEvent::class, function ($event) use ($track) {
+            return $track->id == $event->sentEmail->id &&
+                $event->ipAddress == '127.0.0.1';
         });
         $this->assertDatabaseHas('sent_emails', [
             'id' => $track->id,

@@ -44,8 +44,8 @@ class RecordComplaintJobTest extends SetUpTest
         $this->assertEquals(12345, $meta->get('complaint_time'));
         $this->assertEquals(json_decode(json_encode($message), true), $meta->get('sns_message_complaint'));
         Event::assertDispatched(ComplaintMessageEvent::class, function ($event) use ($track) {
-            return $event->email_address == 'recipient@example.com' &&
-                $event->sent_email->hash == $track->hash;
+            return $event->emailAddress == 'recipient@example.com' &&
+                $event->sentEmail->hash == $track->hash;
         });
     }
 }

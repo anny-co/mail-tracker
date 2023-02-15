@@ -48,8 +48,8 @@ class RecordBounceJobTest extends SetUpTest
         $this->assertFalse($meta->get('success'));
         $this->assertEquals(json_decode(json_encode($message), true), $meta->get('sns_message_bounce'));
         Event::assertDispatched(PermanentBouncedMessageEvent::class, function ($event) use ($track) {
-            return $event->email_address == 'recipient@example.com' &&
-                $event->sent_email->hash == $track->hash;
+            return $event->emailAddress == 'recipient@example.com' &&
+                $event->sentEmail->hash == $track->hash;
         });
     }
 
@@ -93,10 +93,10 @@ class RecordBounceJobTest extends SetUpTest
         $this->assertFalse($meta->get('success'));
         $this->assertEquals(json_decode(json_encode($message), true), $meta->get('sns_message_bounce'));
         Event::assertDispatched(TransientBouncedMessageEvent::class, function ($event) use ($track) {
-            return $event->email_address == 'recipient@example.com' &&
-                $event->bounce_sub_type == 'General' &&
-                $event->diagnostic_code == 'The Diagnostic Code' &&
-                $event->sent_email->hash == $track->hash;
+            return $event->emailAddress == 'recipient@example.com' &&
+                $event->bounceSubType == 'General' &&
+                $event->diagnosticCode == 'The Diagnostic Code' &&
+                $event->sentEmail->hash == $track->hash;
         });
     }
 
@@ -138,10 +138,10 @@ class RecordBounceJobTest extends SetUpTest
         $this->assertFalse($meta->get('success'));
         $this->assertEquals(json_decode(json_encode($message), true), $meta->get('sns_message_bounce'));
         Event::assertDispatched(TransientBouncedMessageEvent::class, function ($event) use ($track) {
-            return $event->email_address == 'recipient@example.com' &&
-                $event->bounce_sub_type == 'General' &&
-                $event->diagnostic_code == '' &&
-                $event->sent_email->hash == $track->hash;
+            return $event->emailAddress == 'recipient@example.com' &&
+                $event->bounceSubType == 'General' &&
+                $event->diagnosticCode == '' &&
+                $event->sentEmail->hash == $track->hash;
         });
     }
 }

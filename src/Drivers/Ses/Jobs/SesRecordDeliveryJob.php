@@ -11,12 +11,13 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Event;
 use jdavidbakr\MailTracker\Events\EmailDeliveredEvent;
 use jdavidbakr\MailTracker\MailTracker;
+use stdClass;
 
 class SesRecordDeliveryJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public SNSMessage $message)
+    public function __construct(public stdClass $message)
     {
     }
 

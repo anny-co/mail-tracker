@@ -11,25 +11,20 @@ class TransientBouncedMessageEvent implements ShouldQueue
 {
     use SerializesModels;
 
-    public $email_address;
-
-    public $sent_email;
-
-    public $bounce_sub_type;
-
-    public $diagnostic_code;
-
     /**
      * Create a new event instance.
      *
-     * @param  string  $email_address
-     * @param  Model|SentEmailModel|null  $sent_email $sent_email
+     * @param string $emailAddress
+     * @param string $bounceSubType
+     * @param string $diagnosticCode
+     * @param Model|SentEmailModel|null $sentEmail $sent_email
      */
-    public function __construct($email_address, $bounce_sub_type, $diagnostic_code, Model|SentEmailModel|null $sent_email = null)
+    public function __construct(
+        public string                    $emailAddress,
+        public string                    $bounceSubType,
+        public string                    $diagnosticCode,
+        public Model|SentEmailModel|null $sentEmail = null
+    )
     {
-        $this->email_address = $email_address;
-        $this->sent_email = $sent_email;
-        $this->bounce_sub_type = $bounce_sub_type;
-        $this->diagnostic_code = $diagnostic_code;
     }
 }

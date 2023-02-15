@@ -14,12 +14,13 @@ use jdavidbakr\MailTracker\Contracts\SentEmailModel;
 use jdavidbakr\MailTracker\Events\PermanentBouncedMessageEvent;
 use jdavidbakr\MailTracker\Events\TransientBouncedMessageEvent;
 use jdavidbakr\MailTracker\MailTracker;
+use stdClass;
 
 class SesRecordBounceJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public function __construct(public SNSMessage $message)
+    public function __construct(public stdClass $message)
     {
     }
 

@@ -43,8 +43,8 @@ class RecordDeliveryJobTest extends SetUpTest
         $this->assertEquals(12345, $meta->get('delivered_at'));
         $this->assertEquals(json_decode(json_encode($message), true), $meta->get('sns_message_delivery'));
         Event::assertDispatched(EmailDeliveredEvent::class, function ($event) use ($track) {
-            return $event->email_address == 'recipient@example.com' &&
-                $event->sent_email->hash == $track->hash;
+            return $event->emailAddress == 'recipient@example.com' &&
+                $event->sentEmail->hash == $track->hash;
         });
     }
 

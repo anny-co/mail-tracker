@@ -24,10 +24,10 @@ class RecordLinkClickJobTest extends SetUpTest
 
         $job->handle();
 
-        Event::assertDispatched(LinkClickedEvent::class, function ($e) use ($track, $redirect) {
-            return $track->id === $e->sent_email->id &&
-                $e->ip_address === '127.0.0.1' &&
-                $e->link_url === $redirect;
+        Event::assertDispatched(LinkClickedEvent::class, function ($event) use ($track, $redirect) {
+            return $track->id === $event->sentEmail->id &&
+                $event->ipAddress === '127.0.0.1' &&
+                $event->linkUrl === $redirect;
         });
         $this->assertDatabaseHas('sent_emails_url_clicked', [
             'url' => $redirect,

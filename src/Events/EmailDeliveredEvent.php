@@ -11,19 +11,15 @@ class EmailDeliveredEvent implements ShouldQueue
 {
     use SerializesModels;
 
-    public $email_address;
-
-    public $sent_email;
-
     /**
      * Create a new event instance.
      *
-     * @param  string  $email_address
-     * @param  Model|SentEmailModel|null  $sent_email
+     * @param string $emailAddress
+     * @param Model|SentEmailModel|null $sentEmail
      */
-    public function __construct($email_address, Model|SentEmailModel|null $sent_email = null)
+    public function __construct(
+        public string $emailAddress,
+        public Model|SentEmailModel|null $sentEmail = null)
     {
-        $this->email_address = $email_address;
-        $this->sent_email = $sent_email;
     }
 }

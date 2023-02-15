@@ -247,7 +247,7 @@ class EmailViewed
      */
     public function handle(ViewEmailEvent $event)
     {
-        // Access the model using $event->sent_email
+        // Access the model using $event->sentEmail
         // Access the IP address that triggered the event using $event->ip_address
     }
 }
@@ -280,7 +280,7 @@ class BouncedEmail
      */
     public function handle(PermanentBouncedMessageEvent $event)
     {
-        // Access the email address using $event->email_address
+        // Access the email address using $event->emailAddress
     }
 }
 ```
@@ -339,8 +339,8 @@ and then in your event listener:
 ```
 public function handle(EmailSentEvent $event)
 {
-    $tracker = $event->sent_email;
-    $model_id = $event->sent_email->getHeader('X-Model-ID');
+    $tracker = $event->sentEmail;
+    $model_id = $event->sentEmail->getHeader('X-Model-ID');
     $model = Model::find($model_id);
     // Perform your tracking/linking tasks on $model knowing the SentEmail object
 }

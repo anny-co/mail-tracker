@@ -12,6 +12,7 @@ use jdavidbakr\MailTracker\Contracts\MailTrackerDriver;
 use jdavidbakr\MailTracker\Drivers\Ses\Jobs\SesRecordBounceJob;
 use jdavidbakr\MailTracker\Drivers\Ses\Jobs\SesRecordComplaintJob;
 use jdavidbakr\MailTracker\Drivers\Ses\Jobs\SesRecordDeliveryJob;
+use stdClass;
 
 class SesDriver implements MailTrackerDriver
 {
@@ -80,19 +81,19 @@ class SesDriver implements MailTrackerDriver
         return response('notification processed');
     }
 
-    protected function processDelivery(SNSMessage $message)
+    protected function processDelivery(stdClass $message)
     {
         dispatch(new SesRecordDeliveryJob($message))
             ->onQueue(config('mail-tracker.tracker-queue'));
     }
 
-    public function processBounce(SNSMessage $message)
+    public function processBounce(stdClass $message)
     {
         dispatch(new SesRecordBounceJob($message))
             ->onQueue(config('mail-tracker.tracker-queue'));
     }
 
-    public function processComplaint(SNSMessage $message)
+    public function processComplaint(stdClass $message)
     {
         dispatch(new SesRecordComplaintJob($message))
             ->onQueue(config('mail-tracker.tracker-queue'));

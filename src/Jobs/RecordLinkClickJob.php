@@ -32,7 +32,7 @@ class RecordLinkClickJob implements ShouldQueue
             ->newQuery()
             ->where('url', $this->url)
             ->where('hash', $this->sentEmail->hash)
-            ->firstOrCreate();
+            ->first();
 
         if ($urlClicked) {
             $urlClicked->clicks++;
